@@ -6,11 +6,11 @@ Project for "Introduction to Data Science" -course
 * Original city bike data source: https://dev.hsl.fi/citybike/stations/
 
 ### Weather data
-* Weather data source: Ilmatieteen laitos / Finnish Meteorological Institute under licence CC BY 4.0.
+* Weather data source: Ilmatieteen laitos / Finnish Meteorological Institute under license CC BY 4.0.
 * Historical data loaded from: https://ilmatieteenlaitos.fi/havaintojen-lataus#!/
 
 ### Population data
-* Population data source: Statistics Finland
+* Population data source: Statistics Finland under license CC BY 4.0
 * Population data loaded from: http://pxnet2.stat.fi/PXWeb/pxweb/en/Postinumeroalueittainen_avoin_tieto/Postinumeroalueittainen_avoin_tieto__2018/paavo_9_koko_2018.px/
 
 ### Coordinate conversion
