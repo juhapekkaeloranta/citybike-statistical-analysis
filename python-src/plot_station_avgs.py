@@ -27,5 +27,4 @@ for stationID in stationIDs[0:2]:
     plt.plot(hours, avgs)
     plt.xlabel("station: " + str(stationID))
     outputfilename = "img/station_" + str(stationID) + ".png"
-    plt.savefig(outputfilename, bbox_inches='tight') 
-
+    plt.savefig(outputfilename, bbox_inches='tight')
