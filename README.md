@@ -1,6 +1,9 @@
 # Statistical analysis of citybike availability in Helsinki
 
-Project for "Introduction to Data Science" -course
+Project for "Introduction to Data Science" -course.
+
+### Project plan
+[Project plan](https://docs.google.com/document/d/1X3f5UQMo5cpXqYQnJM6-z-aw4sNIrAeuVKdYuzaYq7E/edit?usp=sharing) (preliminary) in google docs.
 
 ### City bike data
 * Original city bike data source: https://dev.hsl.fi/citybike/stations/
