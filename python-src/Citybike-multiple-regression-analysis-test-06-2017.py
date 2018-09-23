@@ -7,6 +7,7 @@ import pandas as pd
 import sys, os
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime
 from sklearn.linear_model import LinearRegression
 
 sys.path.append(os.path.realpath('..'))
@@ -36,6 +37,18 @@ bikeData['temperature_c'] = weatherData['temperature_c']
 
 X = bikeData.loc[:, ['rainIntensity_mmh','temperature_c']] # matrix of independent variables 'rainIntensity_mmh' and 'temperature_c'
 y = bikeData[bikeData.columns[1]] # vector of 'sumofhourlyavg'
+
+# Add hour to the matrix of independent variables
+X['hour'] = bikeData['timehour'].apply(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S").hour)
+
+# Add month to the matrix of independent variables
+X['month'] = bikeData['timehour'].apply(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S").month)
+
+# Add weekday to the matrix of independent variables. 0 is Monday, 6 is Sunday.
+X['weekday'] = bikeData['timehour'].apply(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S").weekday())
+
+#print("Variables, row 1: ")
+print(X)
 
 # ##### Splitting the dataset 'A' into the Training set and Test set
 
