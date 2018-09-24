@@ -29,26 +29,38 @@ root = tree.getroot()
 # Up to here OK. But parsing the wanted parts not working yet.
 
 # This doesn't work
-#temperatureElement = root.find('.//MeasurementTimeseries[@id="mts-1-1-Temperature"]')
-#print(temperatureElement)
+#temperatureElement = root.find('.//MeasurementTimeseries[@id="{http://www.opengis.net/gml/3.2}mts-1-1-Temperature"]')
+
+print(ET.tostring(root, encoding='utf8').decode('utf8'))
+
+#temperatureSeries = {}
+#rainAmountSeries = {}
+print('Individual elements: ')
+temperatureElements = root.findall('.//{http://www.opengis.net/waterml/2.0}MeasurementTimeseries')
+for el in temperatureElements:
+    if (el.attrib['{http://www.opengis.net/gml/3.2}id'] == 'mts-1-1-Temperature'):
+        temperatureSeries = el
+        #print(ET.tostring(el, encoding='utf8').decode('utf8'))
+    elif (el.attrib['{http://www.opengis.net/gml/3.2}id'] == 'mts-1-1-PrecipitationAmount'):
+        rainAmountSeries = el
+        #print(ET.tostring(el, encoding='utf8').decode('utf8'))
+
 
 # This parses all MeasurementTimeseries, but I have been unable to filter the correct series by e.g. '{http://www.opengis.net/gml/3.2}id'] == 'mts-1-1-Temperature'
 def parser(item1,item2):
     return item1.text,item2.text
 
 def parse_one_series(series):
-    #print('Series attributes: ', series.attrib)
-    #if (series.attrib['{http://www.opengis.net/gml/3.2}id'] == 'mts-1-1-Temperature'):
     return [parser(item1,item2) for item1,item2 in \
         zip(series.iter(tag='{http://www.opengis.net/waterml/2.0}time'), \
             series.iter(tag='{http://www.opengis.net/waterml/2.0}value'))]
     
 
-data = zip(*(parse_one_series(series) for series in tree.iter(tag='{http://www.opengis.net/waterml/2.0}MeasurementTimeseries')))
+temperatureData = zip(*(parse_one_series(temperatureSeries)))
+print(list(temperatureData))
 
-#data = zip(*(parse_one_series(series) for series in tree.findall('{http://www.opengis.net/gml/3.2}mts-1-1-Temperature')))
-#data = (*(parse_one_series(series) for series in tree.iter(tag='{http://www.opengis.net/waterml/2.0}MeasurementTimeseries')))
+rainAmountData = zip(*(parse_one_series(rainAmountSeries)))
+print(list(rainAmountData))
 
-print(list(data))
 #temperatureElement.write(WEATHERFORECASTOUTXMLFILE)
 #root.write(WEATHERFORECASTOUTXMLFILE)
