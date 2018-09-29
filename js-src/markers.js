@@ -18,7 +18,7 @@ function addStationMarker(coordinates, stationId) {
     icon: defaultIcon
   })
   marker.addListener('click', function () {
-    console.log('clicked on:', marker.title)
+    drawPopup(marker)
   });
   MARKERS.push({markerId: stationId, marker: marker})
 }

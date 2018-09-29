@@ -125,4 +125,6 @@ function initMap() {
   MAP = new google.maps.Map(mapDomElement, mapOptions);
 
   addStationMarkers()
+  
+  definePopupClass()
 }
