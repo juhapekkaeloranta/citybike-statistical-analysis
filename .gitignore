@@ -1,4 +1,5 @@
 env
+env.js
 __pycache__
 .DS_Store
 .vscode/
