@@ -22,3 +22,15 @@ Population data includes data by postal code area. Postal code area location is 
 ### Other resources
 * Some r-scripts: https://github.com/juhapekkamoilanen/citybike-data-analysis
 * Some visualizations: https://github.com/citybike-statistics/citybike-statistics.github.io
+
+# Development
+
+### Web-application
+
+1. Start a local webserver
+
+```
+python3 -m http.server
+```
+
+2. Open browser from localhost:8000
