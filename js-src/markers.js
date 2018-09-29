@@ -4,7 +4,7 @@ function addStationMarker(coordinates, stationId) {
   console.log('adding station markers')
   var defaultIcon = {
     path: google.maps.SymbolPath.CIRCLE,
-    scale: 5,
+    scale: 10,
     strokeColor: '#000000',
     strokeOpacity: 0.8,
     strokeWeight: 0,
@@ -20,7 +20,31 @@ function addStationMarker(coordinates, stationId) {
   marker.addListener('click', function () {
     console.log('clicked on:', marker.title)
   });
-  MARKERS.push({stationId: stationId, marker: marker})
+  MARKERS.push({markerId: stationId, marker: marker})
+}
+
+function editMarkerSize(markerId, scale) {
+  marker = MARKERS[0].marker
+  marker.setMap(null)
+  var editedMarker = new google.maps.Marker({
+    position: marker.position,
+    map: MAP,
+    title: marker.title,
+    icon: { ...marker.icon, scale: scale}
+  })
+  MARKERS.push({markerId: marker.stationId, marker: editedMarker})
+}
+
+function editMarkerColor(markerId, color) {
+  marker = MARKERS[0].marker
+  marker.setMap(null)
+  var editedMarker = new google.maps.Marker({
+    position: marker.position,
+    map: MAP,
+    title: marker.title,
+    icon: { ...marker.icon, fillColor: color}
+  })
+  MARKERS.push({markerId: marker.stationId, marker: editedMarker})
 }
 
 function addStationMarkers() {
@@ -35,7 +59,7 @@ function addStationMarkers() {
 
 function removeMarkers() {
   MARKERS.map(markerObj => {
-   markerObj.marker.setMap(null);
+   marker.setMap(null);
   });
   MARKERS = []
 }
