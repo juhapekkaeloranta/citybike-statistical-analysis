@@ -1,4 +1,6 @@
-function addStationMarker(coordinates, markerTitle) {
+MARKERS = []
+
+function addStationMarker(coordinates, stationId) {
   console.log('adding station markers')
   var defaultIcon = {
     path: google.maps.SymbolPath.CIRCLE,
@@ -12,12 +14,13 @@ function addStationMarker(coordinates, markerTitle) {
   var marker = new google.maps.Marker({
     position: coordinates,
     map: MAP,
-    title: markerTitle,
+    title: stationId,
     icon: defaultIcon
   })
   marker.addListener('click', function () {
     console.log('clicked on:', marker.title)
   });
+  MARKERS.push({stationId: stationId, marker: marker})
 }
 
 function addStationMarkers() {
@@ -28,4 +31,11 @@ function addStationMarkers() {
       addStationMarker({ lat: parseFloat(stat.lat), lng: parseFloat(stat.lon)}, stat.stationId)
     })
   })
+}
+
+function removeMarkers() {
+  MARKERS.map(markerObj => {
+   markerObj.marker.setMap(null);
+  });
+  MARKERS = []
 }
