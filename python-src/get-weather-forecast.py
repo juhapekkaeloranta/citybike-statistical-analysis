@@ -10,33 +10,17 @@ sys.path.append(os.path.realpath('..'))
 WEATHERLOCATION = 'kaisaniemi,helsinki'
 FMIAPIKEYSOURCE = 'env'
 WEATHERFORECASTOUTCSVFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
+REQUESTURL = 'http://data.fmi.fi/fmi-apikey/' \
+           + getFmiApiKey(FMIAPIKEYSOURCE) + '/' \
+           + 'wfs?request=getFeature&storedquery_id=' \
+           + 'fmi::forecast::harmonie::surface::point::timevaluepair' \
+           + '&place=' + WEATHERLOCATION
 
 def getFmiApiKey(f):
     root = ET.parse(f).getroot()
     return root.find('fmi-api-key').text
 
-# Fetch the weather forecast for Helsinki Kaisaniemi from FMI API
-requestURL = 'http://data.fmi.fi/fmi-apikey/' \
-           + getFmiApiKey(FMIAPIKEYSOURCE) + '/' \
-           + 'wfs?request=getFeature&storedquery_id=' \
-           + 'fmi::forecast::harmonie::surface::point::timevaluepair' \
-           + '&place=' + WEATHERLOCATION 
-
-req = urllib.request.Request(requestURL)
-response = urllib.request.urlopen(req)
-
-# Parse the temperature and rain forecasts from the FMI XML file
-tree = ET.parse(response)
-root = tree.getroot()
-
-measurementElements = root.findall('.//{http://www.opengis.net/waterml/2.0}MeasurementTimeseries')
-for el in measurementElements:
-    if (el.attrib['{http://www.opengis.net/gml/3.2}id'] == 'mts-1-1-Temperature'):
-        temperatureSeries = el
-    elif (el.attrib['{http://www.opengis.net/gml/3.2}id'] == 'mts-1-1-PrecipitationAmount'):
-        rainAmountSeries = el
-
-
+# Helper functions
 def parser(item1,item2):
     return item1.text,item2.text
 
@@ -44,20 +28,37 @@ def parse_one_series(series):
     return [parser(item1,item2) for item1,item2 in \
         zip(series.iter(tag='{http://www.opengis.net/waterml/2.0}time'), \
             series.iter(tag='{http://www.opengis.net/waterml/2.0}value'))]
-    
 
-temperatureData = zip(*(parse_one_series(temperatureSeries)))
-temperatureDataList = list(list(temperatureData))
+def fetchAndWriteWeatherForecast():
+    """Fetch the current weather forecast for Helsinki Kaisaniemi from FMI API.
+    Write the forecast in the folder /prediction in a timestamp-named file.
+    """
+    req = urllib.request.Request(REQUESTURL)
+    response = urllib.request.urlopen(req)
 
-rainAmountData = zip(*(parse_one_series(rainAmountSeries)))
-rainDataList = list(list(rainAmountData))
+    # Parse the temperature and rain forecasts from the FMI XML file
+    tree = ET.parse(response)
+    root = tree.getroot()
 
-# Put the data into pandas a dataframe
-df_temperature = pd.DataFrame(temperatureDataList).T
-df_weatherPred = pd.DataFrame(rainDataList).T
+    measurementElements = root.findall('.//{http://www.opengis.net/waterml/2.0}MeasurementTimeseries')
+    for el in measurementElements:
+        if (el.attrib['{http://www.opengis.net/gml/3.2}id'] == 'mts-1-1-Temperature'):
+            temperatureSeries = el
+        elif (el.attrib['{http://www.opengis.net/gml/3.2}id'] == 'mts-1-1-PrecipitationAmount'):
+            rainAmountSeries = el
 
-df_weatherPred[2] = df_temperature[1]
-df_weatherPred.columns = ['Time','RainAmountPred','TemperaturePred']
+    temperatureData = zip(*(parse_one_series(temperatureSeries)))
+    temperatureDataList = list(list(temperatureData))
 
-# Write to csv
-df_weatherPred.to_csv(WEATHERFORECASTOUTCSVFILE, index=False)
+    rainAmountData = zip(*(parse_one_series(rainAmountSeries)))
+    rainDataList = list(list(rainAmountData))
+
+    # Put the data into pandas a dataframe
+    df_temperature = pd.DataFrame(temperatureDataList).T
+    df_weatherPred = pd.DataFrame(rainDataList).T
+
+    df_weatherPred[2] = df_temperature[1]
+    df_weatherPred.columns = ['Time','RainAmountPred','TemperaturePred']
+
+    # Write to csv
+    df_weatherPred.to_csv(WEATHERFORECASTOUTCSVFILE, index=False)
