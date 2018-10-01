@@ -7,18 +7,20 @@ import datetime
 
 sys.path.append(os.path.realpath('..'))
 
+def getFmiApiKey(f):
+    root = ET.parse(f).getroot()
+    return root.find('fmi-api-key').text
+
 WEATHERLOCATION = 'kaisaniemi,helsinki'
 FMIAPIKEYSOURCE = 'env'
-WEATHERFORECASTOUTCSVFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
+WEATHERFORECASTOUTFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
+CURRENTWEATHERFORECASTFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-current.csv'
 REQUESTURL = 'http://data.fmi.fi/fmi-apikey/' \
            + getFmiApiKey(FMIAPIKEYSOURCE) + '/' \
            + 'wfs?request=getFeature&storedquery_id=' \
            + 'fmi::forecast::harmonie::surface::point::timevaluepair' \
            + '&place=' + WEATHERLOCATION
 
-def getFmiApiKey(f):
-    root = ET.parse(f).getroot()
-    return root.find('fmi-api-key').text
 
 # Helper functions
 def parser(item1,item2):
@@ -33,6 +35,7 @@ def fetchAndWriteWeatherForecast():
     """Fetch the current weather forecast for Helsinki Kaisaniemi from FMI API.
     Write the forecast in the folder /prediction in a timestamp-named file.
     """
+    print('\n** Fetching latest weather forecast from FMI API **')
     req = urllib.request.Request(REQUESTURL)
     response = urllib.request.urlopen(req)
 
@@ -60,5 +63,10 @@ def fetchAndWriteWeatherForecast():
     df_weatherPred[2] = df_temperature[1]
     df_weatherPred.columns = ['Time','RainAmountPred','TemperaturePred']
 
-    # Write to csv
-    df_weatherPred.to_csv(WEATHERFORECASTOUTCSVFILE, index=False)
+    # Write to csv, both timestamped version and replace current
+    df_weatherPred.to_csv(WEATHERFORECASTOUTFILE, index=False)
+    df_weatherPred.to_csv(CURRENTWEATHERFORECASTFILE, index=False)
+    print('Latest weather forecast fetched.')
+
+# Execute the fetcher-writer method
+fetchAndWriteWeatherForecast()
