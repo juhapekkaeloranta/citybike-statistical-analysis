@@ -1,4 +1,3 @@
-%matplotlib inline
 import pandas as pd
 import sys, os
 import matplotlib.pyplot as plt
@@ -11,20 +10,27 @@ import warnings
 warnings.filterwarnings("error")
 
 class BikeAvailabilityPredictor:
-    def __init__(self, tempCoeffs, rainCoeffs, hoursCoeffs):
+    def __init__(self, tempCoeffs, rainCoeffs, hoursCoeffs, maxAvailability):
         self.pCoeffsTemp = tempCoeffs
         self.pCoeffsRain = rainCoeffs
         self.pCoeffsHours = hoursCoeffs
+        self.maxAvailability = maxAvailability
 
     def predict(self, temperature_c, rain_MA, hour):
+        return_val = 0
         if (np.isnan(rain_MA) or rain_MA == 0):
             temp_val = np.polyval(self.pCoeffsTemp, temperature_c)
             hour_val = np.polyval(self.pCoeffsHours, hour)
-            return 0.34*temp_val + 0.66*hour_val
+            return_val = 0.29*temp_val + 0.71*hour_val
         else:
             rain_val = np.polyval(self.pCoeffsRain, rain_MA)
             hour_val = np.polyval(self.pCoeffsHours, hour)
-            return 0.71*rain_val + 0.29*hour_val
+            return_val = 0.72*rain_val + 0.28*hour_val + 0.1 # Constant bias 0.1 bikes when raining.
+        if return_val > self.maxAvailability:
+            return self.maxAvailability
+        if return_val < 0 or np.isnan(return_val):
+            return 0
+        return return_val
 
 def readStationDataAndTrainPredictors():
     availPerStation = "bikeAvailability-2017-06-hourly-avg-per-station.csv"
@@ -62,23 +68,26 @@ def readStationDataAndTrainPredictors():
         avlbikes_idx = np.isfinite(singleStation['avlbikes'].values)
         rain_idx = np.nonzero(weatherData['rain_MA'].values.ravel())#& np.isfinite(singleStation['avlbikes'].values)
 
-        if not max(avlbikes_idx):
-            predictors[i] = BikeAvailabilityPredictor([0], [0], [0])
+        if not max(avlbikes_idx): # this checks if avlbikes_idx is all Falses
+            predictors[i] = BikeAvailabilityPredictor([0], [0], [0], 0)
         else:
             # fitting polynomials to each input dataset in relation to the station-wise bike availability
             try:
                 p_coeffsTemp = np.polyfit(weatherData['temperature_c'].values[avlbikes_idx], singleStation['avlbikes'].values[avlbikes_idx], 4)
             except:
+                print(str(i) + " temp")
                 p_coeffsTemp = [np.mean(singleStation['avlbikes'].values[avlbikes_idx])]
             try:
                 p_coeffsRain = np.polyfit(weatherData['rain_MA'].values[rain_idx], singleStation['avlbikes'].values[rain_idx], 2)
             except:
+                print(str(i) + " rain")
                 p_coeffsRain = [np.mean(singleStation['avlbikes'].values[avlbikes_idx])]
             try:
-                p_coeffsHours = np.polyfit(weatherData['Time'].values[avlbikes_idx], singleStation['avlbikes'].values[avlbikes_idx], 3)
+                p_coeffsHours = np.polyfit(weatherData['Time'].values[avlbikes_idx], singleStation['avlbikes'].values[avlbikes_idx], 7) # formerly 3rd degree
             except:
+                print(str(i) + " hour")
                 p_coeffsHours = [np.mean(singleStation['avlbikes'].values[avlbikes_idx])]
-            predictors[i] = BikeAvailabilityPredictor(p_coeffsTemp, p_coeffsRain, p_coeffsHours)
+            predictors[i] = BikeAvailabilityPredictor(p_coeffsTemp, p_coeffsRain, p_coeffsHours, max(singleStation['avlbikes'].values[avlbikes_idx]))
 
 
     return predictors, weatherData, stationData
@@ -92,20 +101,25 @@ def main():
     y_hat = np.zeros(720)
     y = np.zeros(720)
 
+
+
     # Analysis of R^2 by summing individual predictors and observations
     for stationID, pred in preds.items():
         stationVals = stationData[stationData.stationid == stationID]['avlbikes'].values
         for i in range(720):
             actual_avl = stationVals[i]
+            predicted_avl = 0
             if np.isnan(actual_avl):
                 actual_avl = 0
-            predicted_avl = pred.predict(weatherData['temperature_c'].values[i], weatherData['rain_MA'].values[i], weatherData['Time'].values[i])
+            else:
+                predicted_avl = pred.predict(weatherData['temperature_c'].values[i], weatherData['rain_MA'].values[i], weatherData['Time'].values[i])
             if np.isnan(predicted_avl):
                 print(str(stationID) + " " + str(i)) # This should not print, there are problems if it does
-            if predicted_avl < 0:
-                predicted_avl = 0 # some predictions result in negative values due to extrapolation. We limit the predicted availability's minimum to zero.
             y_hat[i] += predicted_avl
             y[i] += actual_avl
+
+
+
 
     print(y_hat)
 
