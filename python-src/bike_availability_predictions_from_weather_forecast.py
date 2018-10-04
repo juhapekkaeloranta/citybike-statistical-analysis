@@ -11,7 +11,6 @@ currentWeatherData['Time'] = currentWeatherData['Time'].apply(lambda x: x.split(
 currentWeatherData['Time'] = currentWeatherData['Time'].apply(lambda x: int(x.split(":")[0]))
 
 preds, _ , _ = model.readStationDataAndTrainPredictors()
-BikeAvailabilityPredictionsFromCurrentWeather()
 
 predictionsTable = np.zeros((24,len(preds.items())))
 current_col = 0
