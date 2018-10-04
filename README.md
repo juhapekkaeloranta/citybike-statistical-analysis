@@ -21,6 +21,10 @@ Population data includes data by postal code area. Postal code area location is 
 
 # Development
 
+### Server
+
+To start server, run file server/server.py. The server currently serves dummy-json data at localhost:3001.
+
 ### Web-application
 
 1. Start a local webserver
