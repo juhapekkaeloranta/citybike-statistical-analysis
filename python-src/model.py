@@ -59,7 +59,7 @@ def readStationDataAndTrainPredictors():
 
     stationCount = 0
     predictors = {}
-    for i in range(1, np.max(stationData['stationid'])):
+    for i in range(1, np.max(stationData['stationid'])+1): # OBS: Have to add one to include the largest id value station
         singleStation = stationData[stationData.stationid == i]
         if singleStation.empty:
             continue
@@ -100,8 +100,6 @@ def main():
 
     y_hat = np.zeros(720)
     y = np.zeros(720)
-
-
 
     # Analysis of R^2 by summing individual predictors and observations
     for stationID, pred in preds.items():
