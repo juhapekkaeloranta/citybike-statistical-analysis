@@ -5,8 +5,6 @@ from xml.etree import ElementTree as ET
 import urllib.request
 import datetime
 
-sys.path.append(os.path.realpath('..'))
-
 def getFmiApiKey(f):
     root = ET.parse(f).getroot()
     return root.find('fmi-api-key').text
@@ -35,7 +33,7 @@ def fetchAndWriteWeatherForecast():
     """Fetch the current weather forecast for Helsinki Kaisaniemi from FMI API.
     Write the forecast in the folder /prediction in a timestamp-named file.
     """
-    print('\n** Fetching latest weather forecast from FMI API **')
+    print('\nFetching latest weather forecast from FMI API...')
     req = urllib.request.Request(REQUESTURL)
     response = urllib.request.urlopen(req)
 
