@@ -33,9 +33,9 @@ class BikeAvailabilityPredictor:
         return return_val
 
 def readStationDataAndTrainPredictors():
-    availPerStation = "bikeAvailability-2017-06-hourly-avg-per-station.csv"
+    availPerStation = "data/02-hourly-avg/bikeAvailability-2017-06-hourly-avg-per-station.csv"
     stationData = pd.read_csv(availPerStation, sep=',')
-    weather_data_file = "fmi-weatherdata-Helsinki-Kaisaniemi-2017.csv"
+    weather_data_file = "weather-data/fmi-weatherdata-Helsinki-Kaisaniemi-2017.csv"
     weatherData = pd.read_csv(weather_data_file, sep=",")
     weatherData.rename(columns={'Vuosi': 'Year', 'Kk': 'Month', 'Pv': 'Day', 'Klo': 'Time', 'Aikavyöhyke': 'Timezone', 'Sateen intensiteetti (mm/h)': 'rainIntensity_mmh', 'Ilman lämpötila (degC)': 'temperature_c'}, inplace=True)
     weatherData = weatherData[weatherData.Month == 6]
