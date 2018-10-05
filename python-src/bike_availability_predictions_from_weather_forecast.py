@@ -6,9 +6,6 @@ import datetime
 import seaborn as sns
 import model
 
-os.chdir('/home/mkotola/IntroDataS/citybike-statistical-analysis')
-print(os.getcwd())
-
 AVAILABILITYFORECASTOUTFILE = 'prediction/BikeAvailability24HourForecast-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
 CURRENTAVAILABILITYFORECASTFILE = 'prediction/BikeAvailability24HourForecast-current.csv'
 
