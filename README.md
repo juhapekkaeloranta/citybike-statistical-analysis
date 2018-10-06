@@ -12,9 +12,6 @@ Project for "Introduction to Data Science" -course.
 * Weather data source: Ilmatieteen laitos / Finnish Meteorological Institute under license CC BY 4.0.
 * Historical data loaded from: https://ilmatieteenlaitos.fi/havaintojen-lataus#!/
 
-### Coordinate conversion
-Population data includes data by postal code area. Postal code area location is given in ETRS89-TM35FIN (Finnish coordinate system). Coordinates can be converted to latitude and longitued (in WGS84 or EUREF-FIN) using e.g. http://coordtrans.fgi.fi/transform.jsp or http://loukko.net/koord_proj/. Note: check which lat-lon system the citybike data and weather data lat-lon coordinates are in.
-
 ### Other resources
 * Some r-scripts: https://github.com/juhapekkamoilanen/citybike-data-analysis
 * Some visualizations: https://github.com/citybike-statistics/citybike-statistics.github.io
@@ -23,7 +20,7 @@ Population data includes data by postal code area. Postal code area location is 
 
 ### Server
 
-To start server, run file server/server.py. The server currently serves dummy-json data at localhost:3001.
+To start server, run file python-src/server.py. The server currently serves 24 hour availability prediction data (all stations) in JSON format at localhost:3001/prediction.
 
 ### Web-application
 
