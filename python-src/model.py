@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import datetime
 import seaborn as sns
+import read_history_data as rhd
 
 # Useful if the polynomials fit the data poorly, so the predictor would return the average availability for the station
 import warnings
@@ -33,13 +34,8 @@ class BikeAvailabilityPredictor:
         return return_val
 
 def readStationDataAndTrainPredictors():
-    availPerStation = "data/02-hourly-avg/bikeAvailability-2017-06-hourly-avg-per-station.csv"
-    stationData = pd.read_csv(availPerStation, sep=',')
-    weather_data_file = "weather-data/fmi-weatherdata-Helsinki-Kaisaniemi-2017.csv"
-    weatherData = pd.read_csv(weather_data_file, sep=",")
-    weatherData.rename(columns={'Vuosi': 'Year', 'Kk': 'Month', 'Pv': 'Day', 'Klo': 'Time', 'Aikavyöhyke': 'Timezone', 'Sateen intensiteetti (mm/h)': 'rainIntensity_mmh', 'Ilman lämpötila (degC)': 'temperature_c'}, inplace=True)
-    weatherData = weatherData[weatherData.Month == 6]
-    weatherData["Time"] = weatherData["Time"].apply(lambda x: int(x.split(":")[0]))
+    weatherData, stationData = rhd.readData()
+    weatherData["Time"] = weatherData["HourMin"].apply(lambda x: int(x.split(":")[0]))
 
     nRows = len(weatherData)
 
@@ -51,7 +47,8 @@ def readStationDataAndTrainPredictors():
         sum_count = 0
         for j in range(moving_average_window_size):
             if (i-j >= 0):
-                avg_val += weatherData['rainIntensity_mmh'].values[i-j] # moving average
+                if np.isfinite(weatherData['rainIntensity_mmh'].values[i-j]):
+                    avg_val += weatherData['rainIntensity_mmh'].values[i-j] # moving average
                 sum_count += 1
         avg_val /= sum_count
         weatherData['rain_MA'].values[i] = avg_val
@@ -66,7 +63,7 @@ def readStationDataAndTrainPredictors():
         stationCount += 1
 
         avlbikes_idx = np.isfinite(singleStation['avlbikes'].values)
-        rain_idx = np.nonzero(weatherData['rain_MA'].values.ravel())#& np.isfinite(singleStation['avlbikes'].values)
+        rain_idx = weatherData['rain_MA'].values != 0 & np.isfinite(singleStation['avlbikes'].values)
 
         if not max(avlbikes_idx): # this checks if avlbikes_idx is all Falses
             predictors[i] = BikeAvailabilityPredictor([0], [0], [0], 0)
@@ -98,13 +95,14 @@ def main():
     # Now using everything that was defined previously...
     preds, weatherData, stationData = readStationDataAndTrainPredictors()
 
-    y_hat = np.zeros(720)
-    y = np.zeros(720)
+    nRows = len(weatherData)
+    y_hat = np.zeros(nRows)
+    y = np.zeros(nRows)
 
     # Analysis of R^2 by summing individual predictors and observations
     for stationID, pred in preds.items():
         stationVals = stationData[stationData.stationid == stationID]['avlbikes'].values
-        for i in range(720):
+        for i in range(nRows):
             actual_avl = stationVals[i]
             predicted_avl = 0
             if np.isnan(actual_avl):
@@ -119,7 +117,13 @@ def main():
 
 
 
-    print(y_hat)
+    #print(y_hat)
+
+    corr = np.corrcoef(y_hat, y)
+    coeff_determination = corr[0][1]**2
+    print('Coefficient of determination (R^2) for the sum of station-wise predictions:', coeff_determination)
+
+
 
 if __name__ == "__main__":
     main()
