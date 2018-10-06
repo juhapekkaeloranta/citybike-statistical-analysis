@@ -11,6 +11,7 @@ Project for "Introduction to Data Science" -course.
 ### Weather data
 * Weather data source: Ilmatieteen laitos / Finnish Meteorological Institute under license CC BY 4.0.
 * Historical data loaded from: https://ilmatieteenlaitos.fi/havaintojen-lataus#!/
+* Weather predictions loaded from FMI open data API, see https://en.ilmatieteenlaitos.fi/open-data-manual-fmi-wfs-services
 
 ### Other resources
 * Some r-scripts: https://github.com/juhapekkamoilanen/citybike-data-analysis
