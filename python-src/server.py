@@ -1,11 +1,15 @@
+import json
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import json
+import controller
 
 HOST_NAME = 'localhost'
 PORT_NUMBER = 3001
 
 class ReqHandler(BaseHTTPRequestHandler):
+    def initiateController(self):
+        self.controller = controller.Controller()
+    
     def do_HEAD(self):
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
@@ -25,7 +29,10 @@ class ReqHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
-        content = json.dumps({"1": 17, "2": 20})
+        if (self.path == '/prediction'):
+            content = self.controller.createAvailabilityPredictionForAllStations()
+        else:
+            content = 'Request path malformed or not defined.'
         return bytes(content, 'UTF-8')
 
     def respond(self, opts):
@@ -36,6 +43,7 @@ class ReqHandler(BaseHTTPRequestHandler):
 if __name__ == '__main__':
     server_class = HTTPServer
     httpd = server_class((HOST_NAME, PORT_NUMBER), ReqHandler)
+    ReqHandler.initiateController(ReqHandler)
     print(time.asctime(), 'Server Starts - %s:%s' % (HOST_NAME, PORT_NUMBER))
     try:
         httpd.serve_forever()

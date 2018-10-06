@@ -10,7 +10,7 @@ AVAIL_DATA_HISTORY_FILES = ['data/02-hourly-avg/bikeAvailability-2017-06-hourly-
 WEATHER_DATA_HISTORY_FILE = 'weather-data/fmi-weatherdata-Helsinki-Kaisaniemi-2017.csv'
 
 def readData():
-    print('\n** Reading in history data for model creation. **')
+    print('\n  Reading in history data for model creation...')
     # Read in data
     df_from_each_bikefile = (pd.read_csv(f) for f in AVAIL_DATA_HISTORY_FILES)
     bikeData   = pd.concat(df_from_each_bikefile, ignore_index=True)
@@ -29,7 +29,7 @@ def readData():
     # Create new datetime column in weatherData combining the time data in separate columns
     weatherData['datetime'] = weatherData.apply(lambda row: str(getTimeStampFromWeatherdataTime(row)), axis=1)
 
-    print('History data read and processed.')
+    print('  History data read and processed.')
     return weatherData, bikeData
 
 def getTimeStampFromBikedataTimeHour(time):

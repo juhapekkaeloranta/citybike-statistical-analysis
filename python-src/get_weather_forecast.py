@@ -66,5 +66,6 @@ def fetchAndWriteWeatherForecast():
     df_weatherPred.to_csv(CURRENTWEATHERFORECASTFILE, index=False)
     print('Latest weather forecast fetched.')
 
-# Execute the fetcher-writer method
-fetchAndWriteWeatherForecast()
+if __name__ == "__main__":
+    # Execute the fetcher-writer method
+    fetchAndWriteWeatherForecast()

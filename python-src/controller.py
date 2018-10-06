@@ -2,6 +2,9 @@ import csv, json
 import os
 import pandas as pd
 
+os.chdir('/home/mkotola/IntroDataS/citybike-statistical-analysis')
+print('Current working dir: ', os.getcwd())
+
 from get_weather_forecast import CURRENTWEATHERFORECASTFILE, fetchAndWriteWeatherForecast
 from bike_availability_predictions_from_weather_forecast import CURRENTAVAILABILITYFORECASTFILE, createPrediction
 from model import readStationDataAndTrainPredictors
@@ -22,12 +25,23 @@ class Controller():
 
     def readCurrentAvailabilityPrediction(self):
         pred = pd.read_csv(CURRENTAVAILABILITYFORECASTFILE)
-        print('\nCurrent availability prediction: \n', pred)
+        # Uncomment to print current availability prediction
+        # print('\nCurrent availability prediction: \n', pred)
         return pred
 
+    def createSingleJSONObject(self, stationid, time, avlBikes):
+        JSONItem = {}
+        JSONItem["stationid"] = stationid
+        JSONItem["time"] = time
+        JSONItem["avlBikes"] = avlBikes
+        return JSONItem
+            
     def convertPredictionToJSON(self, pred):
-        # NOT IMPLEMENTED YET
-        return pred
+        predictionPoints = []
+        for index, row in pred.iterrows():
+            for stationid in pred.columns.values.tolist()[1:]:
+                predictionPoints.append(self.createSingleJSONObject(stationid, row["Time"], row[stationid]))
+        return predictionPoints
 
     def createAvailabilityPredictionForAllStations(self):
         """Create availability prediction for all stations for the next 24 hours. Return in JSON format
@@ -48,12 +62,12 @@ class Controller():
         print('Prediction created.')
 
         currentPrediction = self.readCurrentAvailabilityPrediction()
-        currentPredictionJSON = self.convertPredictionToJSON(currentPrediction)
-        
+        currentPredictionJSON = json.dumps(self.convertPredictionToJSON(currentPrediction))
+        #print(currentPredictionJSON)
         return currentPredictionJSON
 
 def main():
-    print('*** Citybike predictor ***')
+    print('\n*** Citybike predictor ***')
     print('\nBackend started from controller.py.')
     controller = Controller()
     pred = controller.createAvailabilityPredictionForAllStations()
