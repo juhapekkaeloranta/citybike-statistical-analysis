@@ -9,6 +9,7 @@ AVAILABILITYFORECASTOUTFILE = 'prediction/BikeAvailability24HourForecast-' + dat
 CURRENTAVAILABILITYFORECASTFILE = 'prediction/BikeAvailability24HourForecast-current.csv'
 
 def createPrediction(currentWeatherData, preds):
+    print('\nCreating and writing out prediction for all stations...')
     currentWeatherData['Hour'] = currentWeatherData['Time'].apply(lambda x: x.split("T")[1])
     currentWeatherData['Hour'] = currentWeatherData['Hour'].apply(lambda x: int(x.split(":")[0]))
 
@@ -28,3 +29,4 @@ def createPrediction(currentWeatherData, preds):
 
     predsDF.to_csv(AVAILABILITYFORECASTOUTFILE, index=False)
     predsDF.to_csv(CURRENTAVAILABILITYFORECASTFILE, index=False)
+    print('Prediction created.')
