@@ -71,4 +71,11 @@ function dataTypeDefs(d, _, columns) {
   return d;
 }
 
+function testDataFetch(stationId) {
+  console.log("testDataFetch")
+  d3.json("http://localhost:3001/prediction/" + stationId, function (error, data) {
+    console.log(data)
+  })
+}
+
 createStationPlot()

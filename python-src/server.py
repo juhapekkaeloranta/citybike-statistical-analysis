@@ -42,6 +42,7 @@ class ReqHandler(BaseHTTPRequestHandler):
     def handle_http(self, status_code, path):
         self.send_response(status_code)
         self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
         
         if (self.stationHourRegex.match(self.path)):
