@@ -21,7 +21,27 @@ Project for "Introduction to Data Science" -course.
 
 ### Server
 
-To start server, run file python-src/server.py. The server currently serves 24 hour availability prediction data in JSON format at http://localhost:3001 with the following (REST-type) paths:
+To start backend server, run: 
+
+```
+python python-src/server.py
+```
+
+Server will start on `localhost:3001`
+
+### Frontend
+
+1. Start a local webserver to serve html and js files
+
+```
+python3 -m http.server
+```
+
+2. Open browser from localhost:8000
+
+## Server API
+
+The server currently serves 24 hour availability prediction data in JSON format at http://localhost:3001 with the following (REST-type) paths:
 
 Predictions for all stations for 24 h :
 /prediction
@@ -31,13 +51,3 @@ Predictions for a single station defined by station id for 24 h :
 
 Predictions for a station defined by station id and a single hour:
 /prediction/2/2018-10-08T19:00:00Z (here station id 2 and time Oct 8th 2018 19:00)
-
-### Web-application
-
-1. Start a local webserver
-
-```
-python3 -m http.server
-```
-
-2. Open browser from localhost:8000
