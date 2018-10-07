@@ -76,8 +76,8 @@ svg {
 }
 
 #map {
-  height: 800px;
-  width: 960px;
+  height: 90vh;
+  width: 100%;
 }
 /* The location pointed to by the popup tip. */
 .popup-tip-anchor {
@@ -132,4 +132,23 @@ svg {
 
 #hidden-stash > div {
   display: none;
+}
+
+.nav {
+  height: 50px;
+  width: 100%;
+  background-color: #4d4d4d;
+  position: relative;
+  margin-bottom: 8px;
+  vertical-align: middle;
+}
+
+.nav > p {
+  display: inline-block;
+  margin: auto;
+  margin-left: 16px;
+  color: white;
+  font-family: Open Sans;
+  font-size: 24px;
+  line-height: 50px;
 }
