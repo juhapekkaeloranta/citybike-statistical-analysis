@@ -75,7 +75,8 @@ function definePopupClass() {
 function drawPopup(marker) {
   let element = document.getElementById('content');
   let stationIdInt = parseInt(marker.title)
-  element.firstElementChild.setAttribute("src", "/img/station_" + stationIdInt + ".png")
+  //element.firstElementChild.setAttribute("src", "/img/station_" + stationIdInt + ".png")
+  createStationPlot(stationIdInt)
   popup = new Popup(
     new google.maps.LatLng(marker.position.lat(), marker.position.lng()),
     element)

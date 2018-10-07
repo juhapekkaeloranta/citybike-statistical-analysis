@@ -1,4 +1,5 @@
-function createStationPlot() {
+function createStationPlot(stationId) {
+  resetPlot()
   var svg = d3.select("#station-plot"),
     margin = {top: 10, right: 10, bottom: 20, left: 20},
     width = svg.attr("width") - margin.left - margin.right,
@@ -14,17 +15,22 @@ function createStationPlot() {
       .x(function(d) { return x(d.date); })
       .y(function(d) { return y(d.temperature); });
 
-  d3.csv("/data/sample_for_plot.csv", dataTypeDefs, function(error, data) {
+  d3.json("http://localhost:3001/prediction/" + stationId, function (error, data) {
     if (error) throw error;
 
-    var dataRows = data.columns.slice(1).map(function(id) {
-      return {
-        id: id,
-        values: data.map(function(d) {
-          return {date: d.date, temperature: d[id]};
-        })
-      };
-    });
+    var parseTime = d3.utcParse("%Y-%m-%dT%H:%M:%SZ");
+
+    data = data.map(function(row) {
+      return {...row, date: parseTime(row.time)}
+    })
+
+    let predictions = data.map(row => {
+      return {date: row.date, temperature: row.avlBikes}
+    })
+
+    let dataRows = [{id: "Estimates", values: predictions}, {id: "Current", values: predictions}]
+
+    console.log(dataRows)
 
   x.domain(d3.extent(data, function(d) { return d.date; }));
 
@@ -74,8 +80,18 @@ function dataTypeDefs(d, _, columns) {
 function testDataFetch(stationId) {
   console.log("testDataFetch")
   d3.json("http://localhost:3001/prediction/" + stationId, function (error, data) {
-    console.log(data)
+    let predictions = data.map(row => {
+      return {date: row.time, temperature: row.avlBikes}
+    })
+
+    let dataRows = [{id: "Estimates", values: predictions}]
+
+    console.log(dataRows)
   })
 }
 
-createStationPlot()
+function resetPlot() {
+  d3.select("#station-plot").selectAll("*").remove()
+}
+
+createStationPlot(8)
