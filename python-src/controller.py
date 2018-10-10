@@ -2,6 +2,7 @@ import csv, json
 import os
 import pandas as pd
 import datetime
+from datetime import datetime, date, time, timedelta
 
 from get_weather_forecast import CURRENTWEATHERFORECASTFILE, fetchAndWriteWeatherForecast
 from bike_availability_predictions_from_weather_forecast import CURRENTAVAILABILITYFORECASTFILE, createPrediction
@@ -13,9 +14,9 @@ INTERVAL_FOR_NEW_PREDICTIONS = 60 # in seconds
 class Controller():
     def __init__(self):
         self.predictors = self.createPredictionModel()
-        self.latestPredictionUpdateTime = datetime.datetime(2000, 1, 1)
+        self.latestPredictionUpdateTime = datetime(2000, 1, 1)
         self.updateWeatherAndAvailabilityPredictions()
-        self.latestPredictionUpdateTime = datetime.datetime.now()
+        self.latestPredictionUpdateTime = datetime.now()
         
     def createPredictionModel(self):
         """ Create stationwise prediction models, train them on historical data and return them """
@@ -45,7 +46,7 @@ class Controller():
         return predictionPoints
 
     def updateWeatherAndAvailabilityPredictions(self):
-        timeFromLastUpdate = (datetime.datetime.now() - self.latestPredictionUpdateTime).total_seconds()
+        timeFromLastUpdate = (datetime.now() - self.latestPredictionUpdateTime).total_seconds()
         print('Time difference from last update in seconds: ', timeFromLastUpdate)
         if (timeFromLastUpdate > INTERVAL_FOR_NEW_PREDICTIONS):
             print('Updating predictions...')
@@ -91,6 +92,18 @@ class Controller():
         currentPrediction = currentPrediction.loc[currentPrediction['Time'] == timestamp]
         currentPredictionJSON = json.dumps(self.convertPredictionToJSON(currentPrediction))
         return currentPredictionJSON
+
+    def getHistoryData(self, stationid, endTime):
+        year = datetime.strptime(endTime, "%Y")
+        month = datetime.strptime(endTime, "%m")
+        df = pd.read_csv("data/02-hourly-avg/bikeAvailability-" + year + "-" + month + "-hourly-avg-per-station.csv")
+        df['time'] = pd.to_datetime(df['time'])
+        endTime = datetime.strptime(endTime, "%Y-%m-%d %H:%M:%S")
+        startTime = endTime - timedelta(hours=25)
+        df = df[(df['stationid'] == stationid) & 
+            (df.time < endTime) &
+            (df.time > startTime)]
+        return df
 
 def main():
     print('\n*** Citybike predictor ***')
