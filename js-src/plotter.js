@@ -13,9 +13,10 @@ function createStationPlot(stationId) {
   var line = d3.line()
       .curve(d3.curveBasis)
       .x(function(d) { return x(d.date); })
-      .y(function(d) { return y(d.temperature); });
+      .y(function(d) { return y(d.avlBikes); });
 
-  d3.json("http://localhost:3001/prediction/" + stationId, function (error, data) {
+  //d3.json("http://localhost:3001/prediction/" + stationId, function (error, data) {
+  d3.json("http://localhost:8000/data/05-mock/availability-with-predictions.json", function (error, data) {
     if (error) throw error;
 
     var parseTime = d3.utcParse("%Y-%m-%dT%H:%M:%SZ");
@@ -25,19 +26,25 @@ function createStationPlot(stationId) {
     })
 
     let predictions = data.map(row => {
-      return {date: row.date, temperature: row.avlBikes}
+      return {date: row.date, avlBikes: row.prediction}
     })
 
-    let dataRows = [{id: "Estimates", values: predictions}, {id: "Current", values: predictions}]
-
-    console.log(dataRows)
+    let observations = data
+      .map(row => {
+        if (row.avlBikes) {
+          return {date: row.date, avlBikes: row.avlBikes}
+        }
+      })
+      .filter(value => value && true)
+      
+    let dataRows = [{id: "Estimates", values: predictions}, {id: "Current", values: observations}]
 
   x.domain(d3.extent(data, function(d) { return d.date; }));
 
   //set y axis min and max
   y.domain([
     0,
-    Math.max(15, d3.max(dataRows, function(c) { return d3.max(c.values, function(d) { return d.temperature; }); }))
+    Math.max(15, d3.max(dataRows, function(c) { return d3.max(c.values, function(d) { return d.avlBikes; }); }))
   ]);
 
   z.domain(dataRows.map(function(c) { return c.id; }));
@@ -81,7 +88,7 @@ function testDataFetch(stationId) {
   console.log("testDataFetch")
   d3.json("http://localhost:3001/prediction/" + stationId, function (error, data) {
     let predictions = data.map(row => {
-      return {date: row.time, temperature: row.avlBikes}
+      return {date: row.time, avlBikes: row.avlBikes}
     })
 
     let dataRows = [{id: "Estimates", values: predictions}]
