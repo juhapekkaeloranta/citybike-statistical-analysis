@@ -79,15 +79,15 @@ Note: The same thing can be achieved with SQL like this:
 
 ```sql
 select 
-		stationid as station, 
-		date_trunc('hour', time) as UTC_hour,
-		round(avg(avlbikes),1) as avg
-	from 
-		citybikeschema.availability
-	group by 
-		station, UTC_hour
-	order by 
-		UTC_hour, station;
+	stationid as station, 
+	date_trunc('hour', time) as UTC_hour,
+	round(avg(avlbikes),1) as avg
+from 
+	citybikeschema.availability
+group by 
+	station, UTC_hour
+order by 
+	UTC_hour, station;
 ```
 
 ## Step 3: Combine weather data
