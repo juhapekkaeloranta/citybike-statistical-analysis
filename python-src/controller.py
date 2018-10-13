@@ -72,7 +72,7 @@ class Controller():
 
             # Create stationwise predictions for the next 24 hours and write them to disk
             createPrediction(currentWeatherPred, self.predictors)
-            self.latestPredictionUpdateTime = datetime.datetime.now()
+            self.latestPredictionUpdateTime = datetime.now()
             print('Predictions updated.')
         else:
             print('No need to update predictions yet.')

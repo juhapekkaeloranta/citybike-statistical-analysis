@@ -7,8 +7,17 @@ from constants import stationIds
 
 sys.path.append(os.path.realpath('..')) 
 
-df = pd.read_csv('data/01-raw-data/raw-bikeAvailability-2017-08.csv')
+startDate = '09/1/2018'
+days = 30
+filetime = '2018-09'
+filename = 'data/01-raw-data/raw-bikeAvailability-' + filetime + '.csv'
+outfilename = 'data/02-hourly-avg/bikeAvailability-' + filetime + '-hourly-avg-per-station.csv'
+
+df = pd.read_csv(filename)
 #df = pd.read_csv('data/01-raw-data/minutely-data-sample.csv')
+
+print('CSV read. Size:')
+print(df.size)
 
 stations = pd.DataFrame({'stationid': stationIds})
 
@@ -19,7 +28,13 @@ def roundTimestampToHour(strTimestamp):
     
 df['time'] = df.apply( lambda row: roundTimestampToHour(row['time']) , axis=1 )
 
+print('time rounded:')
+print(df[0:5])
+
 hourlyAvg = df.groupby(['stationid', 'time']).mean().round(decimals=1)
+
+print('AVG, group by:')
+print(hourlyAvg[0:5])
 
 '''
 Data is missing some rows. I.e. no data for some hours at all!
@@ -39,9 +54,12 @@ def cartesianProduct(A, B):
     merged = merged.drop(['tmp'], axis=1)
     return merged
 
-monthHours = buildDateRangeDf('08/1/2017', 31)
+print('merging..')
+monthHours = buildDateRangeDf(startDate, days)
 stationsXtimestamps = cartesianProduct(stations, monthHours)
 
 ready_df = pd.merge(stationsXtimestamps, hourlyAvg,  how='left', left_on=['stationid','time'], right_on = ['stationid','time'])
 
-ready_df.to_csv('bikeAvailability-2017-08-hourly-avg-per-station.csv', index=False, na_rep="NaN")
+print('Saving file..')
+ready_df.to_csv(outfilename, index=False, na_rep="NaN")
+print('Done!')
