@@ -8,28 +8,28 @@ Sample:
 
 ```json
 {
-  result: [
+  "result": [
     {
-      name: "001 Kaivopuisto",
-      coordinates: "60.155411,24.950391",
-      total_slots: 30,
-      free_slots: 6,
-      avl_bikes: 29,
-      operative: true,
-      style: "Station on"
+      "name": "001 Kaivopuisto",
+      "coordinates": "60.155411,24.950391",
+      "total_slots": 30,
+      "free_slots": 6,
+      "avl_bikes": 29,
+      "operative": true,
+      "style": "Station on"
     },
     {
-      name: "002 Laivasillankatu",
-      coordinates: "60.159715,24.955212",
-      total_slots: 12,
-      free_slots: 9,
-      avl_bikes: 2,
-      operative: true,
-      style: "Station on"
+      "name": "002 Laivasillankatu",
+      "coordinates": "60.159715,24.955212",
+      "total_slots": 12,
+      "free_slots": 9,
+      "avl_bikes": 2,
+      "operative": true,
+      "style": "Station on"
     },
 ```
 
-We used a python script to combine these into one csv file per month.
+We used a python [script](/data-wrangling-src/processFiles.py) to combine these into one csv file per month.
 
 Output sample:
 
@@ -53,7 +53,7 @@ Output sample:
 
 ## Step 2: Aggregate
 
-With around 250 stations this csv has 250*43000=11M rows. We reduced it by taking avegare for each hour. Now the rowcount is aroung 100K per month which is easier to manage.
+With around 250 stations this csv has 250*43000=11M rows. We reduced it by taking avegare for each hour. Now the rowcount is aroung 100K per month which is easier to manage. Here's the [script](/data-wrangling-src/calc-hourly-avg.py).
 
 Sample:
 
@@ -73,6 +73,21 @@ stationid,time,avlbikes
 1,2017-06-01 11:00:00,2.8
 1,2017-06-01 12:00:00,4.0
 1,2017-06-01 13:00:00,12.2
+```
+
+Note: The same thing can be achieved with SQL like this:
+
+```sql
+select 
+		stationid as station, 
+		date_trunc('hour', time) as UTC_hour,
+		round(avg(avlbikes),1) as avg
+	from 
+		citybikeschema.availability
+	group by 
+		station, UTC_hour
+	order by 
+		UTC_hour, station;
 ```
 
 ## Step 3: Combine weather data
