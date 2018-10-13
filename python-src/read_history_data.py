@@ -6,7 +6,11 @@ from conversion import getTimeStampFromBikedataTimeHour, getTimeStampFromTmarked
 
 AVAIL_DATA_HISTORY_FILES = ['data/02-hourly-avg/bikeAvailability-2017-06-hourly-avg-per-station.csv',
 'data/02-hourly-avg/bikeAvailability-2017-08-hourly-avg-per-station.csv', 
-'data/02-hourly-avg/bikeAvailability-2017-09-hourly-avg-per-station.csv']
+'data/02-hourly-avg/bikeAvailability-2017-09-hourly-avg-per-station.csv',
+'data/02-hourly-avg/bikeAvailability-2018-06-hourly-avg-per-station.csv',
+'data/02-hourly-avg/bikeAvailability-2018-07-hourly-avg-per-station.csv', 
+'data/02-hourly-avg/bikeAvailability-2018-08-hourly-avg-per-station.csv', 
+'data/02-hourly-avg/bikeAvailability-2018-09-hourly-avg-per-station.csv']
 WEATHER_DATA_HISTORY_FILES = ['weather-data/fmi-weatherdata-Helsinki-Kaisaniemi-2016.csv',
 'weather-data/fmi-weatherdata-Helsinki-Kaisaniemi-2017.csv', 
 'weather-data/fmi-weatherdata-Helsinki-Kaisaniemi-2018.csv']
@@ -22,9 +26,9 @@ def readWeatherData():
     
     # Filter only June, August and September 2017, which we have bike availability data from
     weatherData = weatherData[
-        ((weatherData.Year == 2017) & (weatherData.Month.isin([6, 8, 9]))) 
         # ADD THE NEW MONTHS HERE AS OR-CONDITIONS
-        #| ((weatherData.Year == 2016) & (weatherData.Month.isin([7, 8, 9])))
+        ((weatherData.Year == 2017) & (weatherData.Month.isin([6, 8, 9]))) 
+        | ((weatherData.Year == 2018) & (weatherData.Month.isin([6, 7, 8, 9])))
         ]
     # Create new datetime column in weatherData combining the time data in separate columns
     weatherData['datetime'] = weatherData.apply(lambda row: str(getTimeStampFromWeatherdataTime(row)), axis=1)

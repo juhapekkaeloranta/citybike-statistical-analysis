@@ -2,7 +2,6 @@ import csv, json
 import os, sys
 import pandas as pd
 import datetime
-#from datetime import datetime, date, time, timedelta
 
 from get_weather_forecast import CURRENTWEATHERFORECASTFILE, fetchAndWriteWeatherForecast
 from bike_availability_predictions_from_weather_forecast import CURRENTAVAILABILITYFORECASTFILE, HISTORICALAVAILABILITYFORECASTFILE, createPrediction, createHistoricalPrediction
@@ -20,6 +19,10 @@ class Controller():
         self.latestPredictionUpdateTime = datetime.datetime(2000, 1, 1)
         self.updateWeatherAndAvailabilityPredictions()
         self.latestPredictionUpdateTime = datetime.datetime.now()
+        self.historyPrediction = {}
+        self.bikeAvailabilityHistory = {}
+        self.historyLoaded = False
+        pd.options.mode.chained_assignment = None
         
     def createPredictionModel(self):
         """ Create stationwise prediction models, train them on historical data and return them """
@@ -72,7 +75,7 @@ class Controller():
 
             # Create stationwise predictions for the next 24 hours and write them to disk
             createPrediction(currentWeatherPred, self.predictors)
-            self.latestPredictionUpdateTime = datetime.now()
+            self.latestPredictionUpdateTime = datetime.datetime.now()
             print('Predictions updated.')
         else:
             print('No need to update predictions yet.')
@@ -136,28 +139,40 @@ class Controller():
         bikeAvailabilityHistory = bikeAvailabilityHistory.reset_index(drop=True)
         return bikeAvailabilityHistory
 
-    def getHistoryDataForOneStation(self, stationid, centreTime):
-        bikeAvailabilityHistory = read_history_data.readBikeData()
-        # Convert column time from string format to actual timestamps
-        bikeAvailabilityHistory['time'] = pd.to_datetime(bikeAvailabilityHistory['time'])
+    def loadHistory(self):
+        print('Fetching history data to controller memory...')
+        self.historyPrediction = self.readHistoricalAvailabilityPrediction()
+        self.historyPrediction.loc[:,'Time'] = pd.to_datetime(self.historyPrediction['Time'])
+            
+        self.bikeAvailabilityHistory = read_history_data.readBikeData()
+        self.bikeAvailabilityHistory['time'] = pd.to_datetime(self.bikeAvailabilityHistory['time'])
+        
+        self.historyLoaded = True
+        print('History data fetched to controller memory.')
 
+    def getHistoryDataForOneStation(self, stationid, centreTime):
         startDateTime, centreDateTime, endDateTime = self.getTimeLimits(centreTime)
 
+        bikeAvailabilityHistory = self.bikeAvailabilityHistory.copy(deep=True)
         bikeAvailabilityHistory = bikeAvailabilityHistory[(bikeAvailabilityHistory['stationid'] == stationid) & 
             (bikeAvailabilityHistory.time <= centreDateTime) &
             (bikeAvailabilityHistory.time >= startDateTime)]
         bikeAvailabilityHistory = bikeAvailabilityHistory.reset_index(drop=True)
         return bikeAvailabilityHistory
-
+    
     def getHistoryAvailabilityPredictionForOneStation(self, stationidStr, centreTime):
         """Returns historical availability prediction for one station for +-12 hours from given time in JSON format
         with each object a single prediction for station id and time. Includes actual data from -12 hours to given time."""
 
         stationid = int(stationidStr) 
-        historyPrediction = self.readHistoricalAvailabilityPrediction()
-        historyPrediction = historyPrediction[['Time', str(stationid)]]
-        historyPrediction['Time'] = pd.to_datetime(historyPrediction['Time'])
         
+        # Only read in history predictions once and store in controller's memory
+        #print('Truth value: ', not self.historyPredictionLoaded)
+        if not (self.historyLoaded):
+            self.loadHistory()
+        
+        historyPrediction = self.historyPrediction.copy(deep=True)
+        historyPrediction = historyPrediction[['Time', str(stationid)]]        
         startDateTime, centreDateTime, endDateTime = self.getTimeLimits(centreTime)
 
         historyPrediction = historyPrediction[ 
@@ -166,12 +181,10 @@ class Controller():
         
         historyPrediction['Time'] = historyPrediction['Time'].dt.strftime("%Y-%m-%dT%H:%M:%SZ")
         historyPrediction = historyPrediction.reset_index(drop=True)
-        print(historyPrediction)
-        
+                
         historyDataForOneStation = self.getHistoryDataForOneStation(stationid, centreTime)
         historyDataForOneStation['time'] = historyDataForOneStation['time'].dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-        print(historyDataForOneStation)
-
+        
         # Merge the data into one dataframe and reformat to match API requirements
         combined = pd.merge(left=historyPrediction, left_on='Time', right=historyDataForOneStation, right_on='time', how='outer',)
         combined = combined.drop(columns=['time'])
@@ -181,8 +194,7 @@ class Controller():
         combined['avlbikes'].replace({-1: None}, inplace=True)
         combined['stationid'] = combined['stationid'].astype(int, inplace=True).apply(str)
         combined['prediction'] = combined['prediction'].round(2)
-        print(combined)
-
+        
         historyPredictionJSON = json.dumps(self.convertCombinedToJSON(combined))
         return historyPredictionJSON
         
@@ -190,10 +202,17 @@ def main():
     print('\n*** Citybike predictor ***')
     print('\nBackend started from controller.py.')
     controller = Controller()
-    pred = controller.getAvailabilityPredictionForAllStations()
+    
+    # Get availability forecasts for all stations for the next 24 hours.
+    #pred = controller.getAvailabilityPredictionForAllStations()
+    
+    # Here you can update all historical availability predictions. If you have new weather data,
+    # run convert_weatherdata_to_historical_forecast.py before running this.
     #controller.createHistoricalAvailabilityPrediction()
-    sampleJSON = controller.getHistoryAvailabilityPredictionForOneStation("2", "2017-06-12T22:00:00Z")
-    print(sampleJSON)
+
+    # Get a sample of combined history data in JSON (as the server API at /combined/2/2017-06-12T22:00:00Z will return it)
+    #sampleJSON = controller.getHistoryAvailabilityPredictionForOneStation("2", "2017-06-12T22:00:00Z")
+    #print(sampleJSON)
 
 if __name__ == "__main__":
     main()

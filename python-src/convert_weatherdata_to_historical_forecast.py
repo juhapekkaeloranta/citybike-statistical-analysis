@@ -3,6 +3,7 @@ import sys, os
 import numpy as np
 import datetime
 import conversion
+import read_history_data
 
 HISTORYWEATHERFORECASTOUTFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-history.csv'
 
@@ -12,7 +13,7 @@ def convertWeatherdataToHistoricalForecast():
     weatherData.drop(columns=['Year', 'Month', 'Day', 'HourMin', 'Timezone'])
     weatherData = weatherData[['datetime', 'rainIntensity_mmh', 'temperature_c']]
     weatherData.columns = ['Time','RainAmountPred','TemperaturePred']
-    weatherData['Time'] = weatherData['Time'].apply(lambda timestamp: conversion.getUTCTimeStampFromTimeStamp(timestamp))
+    weatherData['Time'] = weatherData['Time'].apply(lambda timestamp: conversion.getUTCTimeStampFromTimeStampString(timestamp))
     #print(weatherData)
 
     weatherData.to_csv(HISTORYWEATHERFORECASTOUTFILE, index=False)
