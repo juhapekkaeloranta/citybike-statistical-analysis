@@ -51,3 +51,8 @@ Predictions for a single station defined by station id for 24 h :
 
 Predictions for a station defined by station id and a single hour:
 /prediction/2/2018-10-08T19:00:00Z (here station id 2 and time Oct 8th 2018 19:00)
+
+The server also serves historical data in JSON format at paths formatted like:
+/combined/8/2018-09-12T12:00:00Z (here station id 8 and centre time Sept 12th 2018 12:00)
+
+The historical data range is from 12 hours before the called time to 12 hours after the called time. Actual availability data is given for the 12 hours before the called time (and is null for the 12 hours after). Prediction data covers the whole 24 hour period.
