@@ -34,7 +34,8 @@ class BikeAvailabilityPredictor:
         return return_val
 
 def readStationDataAndTrainPredictors():
-    weatherData, stationData = rhd.readData()
+    weatherData = rhd.readWeatherData()
+    stationData = rhd.readBikeData()
     weatherData["Time"] = weatherData["HourMin"].apply(lambda x: int(x.split(":")[0]))
 
     nRows = len(weatherData)
