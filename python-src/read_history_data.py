@@ -24,7 +24,7 @@ def readWeatherData():
     weatherData.rename(columns={'Vuosi': 'Year', 'Kk': 'Month', 'Pv': 'Day', 'Klo': 'HourMin', 'Aikavyöhyke': 'Timezone', 'Sateen intensiteetti (mm/h)': 'rainIntensity_mmh', 'Ilman lämpötila (degC)': 'temperature_c'}, inplace=True)  
     weatherData = weatherData.reset_index(drop=True)
     
-    # Filter only June, August and September 2017, which we have bike availability data from
+    # Filter only the months which we have bike availability data from
     weatherData = weatherData[
         # ADD THE NEW MONTHS HERE AS OR-CONDITIONS
         ((weatherData.Year == 2017) & (weatherData.Month.isin([6, 8, 9]))) 

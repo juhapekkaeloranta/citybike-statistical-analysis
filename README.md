@@ -56,3 +56,11 @@ The server also serves historical data in JSON format at paths formatted like:
 /combined/8/2018-09-12T12:00:00Z (here station id 8 and centre time Sept 12th 2018 12:00)
 
 The historical data range is from 12 hours before the called time to 12 hours after the called time. Actual availability data is given for the 12 hours before the called time (and is null for the 12 hours after). Prediction data covers the whole 24 hour period.
+
+# Details on the current model and data
+
+## Model
+* Model is trained on data from 2018-08 and 2018-09
+
+## Historical data available
+* Historical data includes months 2017-06, 2017-08, 2017-09, 2018-06, 2018-07, 2018-08 and 2018-09

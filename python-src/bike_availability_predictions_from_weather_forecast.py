@@ -5,6 +5,9 @@ import numpy as np
 import datetime
 import seaborn as sns
 
+from convert_weatherdata_to_historical_forecast import HISTORYWEATHERFORECASTOUTFILE
+from model import readStationDataAndTrainPredictors
+
 AVAILABILITYFORECASTOUTFILE = 'prediction/BikeAvailability24HourForecast-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
 CURRENTAVAILABILITYFORECASTFILE = 'prediction/BikeAvailability24HourForecast-current.csv'
 HISTORICALAVAILABILITYFORECASTFILE = 'prediction/BikeAvailability24HourForecast-historical.csv'
@@ -53,3 +56,10 @@ def createHistoricalPrediction(historicalWeatherData, preds):
 
     predsDF.to_csv(HISTORICALAVAILABILITYFORECASTFILE, index=False)
     print('Historical predictions created.')
+
+if __name__ == "__main__":
+    historyWeatherPred = pd.read_csv(HISTORYWEATHERFORECASTOUTFILE)
+    predictors, _ , _ = readStationDataAndTrainPredictors()
+    createHistoricalPrediction(historyWeatherPred, predictors)
+    
+    

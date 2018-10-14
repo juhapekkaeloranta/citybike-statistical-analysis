@@ -5,6 +5,7 @@ import numpy as np
 import datetime
 import seaborn as sns
 import read_history_data as rhd
+import conversion
 
 # Useful if the polynomials fit the data poorly, so the predictor would return the average availability for the station
 import warnings
@@ -36,6 +37,15 @@ class BikeAvailabilityPredictor:
 def readStationDataAndTrainPredictors():
     weatherData = rhd.readWeatherData()
     stationData = rhd.readBikeData()
+
+    # Convert time to actual timestamps
+    stationData['time'] = stationData['time'].apply(lambda t: conversion.getTimeStampFromBikedataTimeHour(t))
+    
+    # Limit the model to train on 2018-08 and 2018-09
+    stationData = stationData[(stationData['time'].apply(lambda t: t.year == 2018)) & (stationData['time'].apply(lambda t: t.month in [8, 9]))]
+    weatherData = weatherData[(weatherData.Year == 2018) & (weatherData.Month.isin([8, 9]))]
+    print('  Model training on data from 2018-08 and 2018-09.')
+    
     weatherData["Time"] = weatherData["HourMin"].apply(lambda x: int(x.split(":")[0]))
 
     nRows = len(weatherData)

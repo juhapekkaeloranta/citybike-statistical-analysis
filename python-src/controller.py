@@ -67,16 +67,17 @@ class Controller():
         if (timeFromLastUpdate > INTERVAL_FOR_NEW_PREDICTIONS):
             print('Updating predictions...')
             # Fetch latest weather forecast, write it to disk and read it back in
-            fetchAndWriteWeatherForecast()
-            currentWeatherPred = pd.read_csv(CURRENTWEATHERFORECASTFILE)
+            fetchSuccess = fetchAndWriteWeatherForecast()
             
-            # Get current bike availability data
-            # NOT IMPLEMENTED
-
-            # Create stationwise predictions for the next 24 hours and write them to disk
-            createPrediction(currentWeatherPred, self.predictors)
-            self.latestPredictionUpdateTime = datetime.datetime.now()
-            print('Predictions updated.')
+            if fetchSuccess:
+                currentWeatherPred = pd.read_csv(CURRENTWEATHERFORECASTFILE)
+            
+                # Create stationwise predictions for the next 24 hours and write them to disk
+                createPrediction(currentWeatherPred, self.predictors)
+                self.latestPredictionUpdateTime = datetime.datetime.now()
+                print('Predictions updated.')
+            else:
+                print('Predictions not updated.')
         else:
             print('No need to update predictions yet.')
 

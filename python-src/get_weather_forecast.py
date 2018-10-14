@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import sys, os
 from xml.etree import ElementTree as ET
-import urllib.request
+import urllib
+import socket
 import datetime
 
 def getFmiApiKey(f):
@@ -34,10 +35,34 @@ def fetchAndWriteWeatherForecast():
     Write the forecast in the folder /prediction in a timestamp-named file.
     """
     print('\nFetching latest weather forecast from FMI API...')
+    
     req = urllib.request.Request(REQUESTURL)
-    response = urllib.request.urlopen(req)
-
-    # Parse the temperature and rain forecasts from the FMI XML file
+    
+    try:
+        response = urllib.request.urlopen(req, timeout=10)
+        parseAndWriteWeatherForecast(response)
+        return True
+    except socket.timeout:
+        print('Latest weather forecast could not be fetched, using old data.')
+        print('socket timed out - URL %s', req)
+        return False
+    except urllib.error.URLError as e:
+        print('Latest weather forecast could not be fetched, using old data.')
+        """ if isinstance(e.reason, socket.timeout):
+            print('  Socket timed out - URL %s', req) """
+        if hasattr(e, 'reason'):
+            print('  Program failed to reach FMI server.')
+            print('  Reason: ', e.reason)
+            
+        elif hasattr(e, 'code'):
+            print('Latest weather forecast could not be fetched, using old data.')
+            print('  The FMI server couldn\'t fulfill the request.')
+            print('  Error code: ', e.code)
+            
+        return False
+   
+def parseAndWriteWeatherForecast(response):
+    """Submethod of fetchAndWriteWeatherForecast."""
     tree = ET.parse(response)
     root = tree.getroot()
 
