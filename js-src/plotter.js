@@ -1,6 +1,10 @@
 //CUR_DATE = "2017-06-11T09:00:00Z"
 CUR_DATE = prompt("Demo mode! Select date:", "2017-06-11T09:00:00Z");
 
+document.getElementById("nav-date").innerHTML = 
+  (new Date(CUR_DATE)).toLocaleDateString('fi-FI') + " " +
+  (new Date(CUR_DATE)).toLocaleTimeString('en-GB')
+
 function createStationPlot(stationId) {
   resetPlot()
   var svg = d3.select("#station-plot"),
