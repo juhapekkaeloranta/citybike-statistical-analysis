@@ -1,4 +1,5 @@
-CUR_DATE = "/2017-06-11T09:00:00Z"
+//CUR_DATE = "2017-06-11T09:00:00Z"
+CUR_DATE = prompt("Demo mode! Select date:", "2017-06-11T09:00:00Z");
 
 function createStationPlot(stationId) {
   resetPlot()
@@ -17,7 +18,7 @@ function createStationPlot(stationId) {
       .x(function(d) { return x(d.date); })
       .y(function(d) { return y(d.avlBikes); });
 
-  d3.json("http://localhost:3001/combined/" + stationId + CUR_DATE, function (error, data) {
+  d3.json("http://localhost:3001/combined/" + stationId + "/" + CUR_DATE, function (error, data) {
     if (error) throw error;
 
     var parseTime = d3.utcParse("%Y-%m-%dT%H:%M:%SZ");
