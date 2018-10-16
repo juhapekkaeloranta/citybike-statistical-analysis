@@ -1,3 +1,5 @@
+CUR_DATE = "/2017-06-11T08:00:00Z"
+
 function createStationPlot(stationId) {
   resetPlot()
   var svg = d3.select("#station-plot"),
@@ -15,8 +17,7 @@ function createStationPlot(stationId) {
       .x(function(d) { return x(d.date); })
       .y(function(d) { return y(d.avlBikes); });
 
-  //d3.json("http://localhost:3001/prediction/" + stationId, function (error, data) {
-  d3.json("http://localhost:8000/data/05-mock/availability-with-predictions.json", function (error, data) {
+  d3.json("http://localhost:3001/combined/" + stationId + CUR_DATE, function (error, data) {
     if (error) throw error;
 
     var parseTime = d3.utcParse("%Y-%m-%dT%H:%M:%SZ");
@@ -73,7 +74,18 @@ function createStationPlot(stationId) {
   bikeData.append("path")
       .attr("class", "line")
       .attr("d", function(d) { return line(d.values); })
-      .style("stroke", function(d) { return z(d.id); });
+      .style("stroke", function(d) { return z(d.id); })
+      .style("stroke-dasharray", function (d) {
+        if (d.id == "Estimates") {
+          let line = 3
+          let gap = 3
+          return line + ", " + gap
+        } else {
+          let line = 3
+          let gap = 0 
+          return line + ", " + gap
+        }
+      });
   });
 }
 
