@@ -7,8 +7,9 @@ import socket
 import datetime
 
 def getFmiApiKey(f):
-    root = ET.parse(f).getroot()
-    return root.find('fmi-api-key').text
+    return os.environ["FMI_API_KEY"]
+    #root = ET.parse(f).getroot()
+    #return root.find('fmi-api-key').text
 
 WEATHERLOCATION = 'kaisaniemi,helsinki'
 FMIAPIKEYSOURCE = 'env'
