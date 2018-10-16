@@ -1,4 +1,4 @@
-CUR_DATE = "/2017-06-11T08:00:00Z"
+CUR_DATE = "/2017-06-11T09:00:00Z"
 
 function createStationPlot(stationId) {
   resetPlot()
@@ -54,7 +54,7 @@ function createStationPlot(stationId) {
   g.append("g")
       .attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x).ticks(12).tickFormat(d3.timeFormat("%I")));
+      .call(d3.axisBottom(x).ticks(12).tickFormat(d3.timeFormat("%H")));
 
   //create y-axis
   g.append("g")
