@@ -74,6 +74,7 @@ function definePopupClass() {
 
 function drawPopup(marker) {
   let element = document.getElementById('content');
+  element.style.display = 'block';
   let stationIdInt = parseInt(marker.title)
   //element.firstElementChild.setAttribute("src", "/img/station_" + stationIdInt + ".png")
   createStationPlot(stationIdInt)
@@ -81,4 +82,8 @@ function drawPopup(marker) {
     new google.maps.LatLng(marker.position.lat(), marker.position.lng()),
     element)
   popup.setMap(MAP);
+}
+
+function hidePopup() {
+  document.getElementById('content').style.display = 'none';
 }

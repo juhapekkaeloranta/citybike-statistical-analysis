@@ -152,3 +152,25 @@ svg {
   font-size: 24px;
   line-height: 50px;
 }
+
+[class*='close-'] {
+  color: #777;
+  font: 14px/100% arial, sans-serif;
+  position: absolute;
+  right: 5px;
+  text-decoration: none;
+  text-shadow: 0 1px 0 #fff;
+  top: 5px;
+}
+
+.close-classic:after {
+  content: 'X'; /* ANSI X letter */
+}
+
+.close-thin:after {
+  content: '×'; /* UTF-8 symbol */
+}
+
+.close-thik:after {
+  content: '✖'; /* UTF-8 symbol */
+}
