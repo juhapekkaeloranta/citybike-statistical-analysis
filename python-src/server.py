@@ -84,7 +84,7 @@ class ReqHandler(BaseHTTPRequestHandler):
             else:
                 content = 'Unknown station id.'
         elif (self.path == '/' or self.path == '/index.html'):
-                f = open(curdir + sep + 'index.html') 
+                f = open(os.curdir + os.sep + 'index.html') 
                 content = f.read()
                 f.close()
         else:
