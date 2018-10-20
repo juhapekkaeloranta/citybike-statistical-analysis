@@ -7,7 +7,7 @@ import controller
 import constants
 
 HOST_NAME = 'localhost'
-PORT_NUMBER = os.environ["PORT"] or 3001
+PORT_NUMBER = int(os.environ["PORT"]) or 3001
 
 class ReqHandler(BaseHTTPRequestHandler):
     stationRegex = re.compile('/prediction/\d+')
