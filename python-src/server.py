@@ -6,7 +6,7 @@ import controller
 import constants
 
 HOST_NAME = 'localhost'
-PORT_NUMBER = 3001
+PORT_NUMBER = os.environ["PORT"] or 3001
 
 class ReqHandler(BaseHTTPRequestHandler):
     stationRegex = re.compile('/prediction/\d+')
@@ -91,12 +91,12 @@ if __name__ == '__main__':
     print('\n*** Citybike predictor ***')
     print('\nBackend started from server.py.')
     server_class = HTTPServer
-    httpd = server_class((HOST_NAME, PORT_NUMBER), ReqHandler)
+    httpd = server_class(("", PORT_NUMBER), ReqHandler)
     ReqHandler.initiateController(ReqHandler)
-    print('\n', time.asctime(), 'Server Starts - %s:%s' % (HOST_NAME, PORT_NUMBER))
+    print('\n', time.asctime(), 'Server Starts - port %s' % (PORT_NUMBER))
     try:
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
     httpd.server_close()
-    print('\n', time.asctime(), 'Server Stops - %s:%s' % (HOST_NAME, PORT_NUMBER))
+    print('\n', time.asctime(), 'Server Stops - port %s' % (PORT_NUMBER))
