@@ -5,7 +5,7 @@ import re
 import controller
 import constants
 
-from flask import Flask, request
+from flask import Flask
 app = Flask(__name__, static_url_path='')
 
 HOST_NAME = 'localhost'
