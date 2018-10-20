@@ -53,7 +53,7 @@ class ReqHandler(BaseHTTPRequestHandler):
     def handle_http(self, status_code, path):
         self.send_response(status_code)
         if (self.path == '/' or self.path == '/index.html'):
-            self.send_header('Content-type',    'text/html')
+            self.send_header('Content-type',    'text/html; charset=utf-8')
         else:
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
