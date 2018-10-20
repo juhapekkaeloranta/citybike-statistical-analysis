@@ -54,6 +54,7 @@ class ReqHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         if (self.path == '/' or self.path == '/index.html'):
             self.send_header('Content-type',    'text/html; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
         else:
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
