@@ -1,9 +1,9 @@
 import pandas as pd
 import sys, os
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 import datetime
-import seaborn as sns
+#import seaborn as sns
 
 from convert_weatherdata_to_historical_forecast import HISTORYWEATHERFORECASTOUTFILE
 from model import readStationDataAndTrainPredictors

@@ -1,11 +1,9 @@
 import numpy as np
 import pandas as pd
 import sys, os
-from xml.etree import ElementTree as ET
-import urllib.request
+#from xml.etree import ElementTree as ET
+#import urllib.request
 import datetime
-
-sys.path.append(os.path.realpath('..'))
 
 AVAILABILITYFOLDER = 'prediction'
 # Must define how to select the latest from the folder
