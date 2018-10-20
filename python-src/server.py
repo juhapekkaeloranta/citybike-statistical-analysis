@@ -2,7 +2,7 @@ import os
 import json
 import time
 import re
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer, SimpleHTTPRequestHandler
 import controller
 import constants
 
@@ -45,13 +45,18 @@ class ReqHandler(BaseHTTPRequestHandler):
                 self.respond({'status': 200})
             else:
                 self.respond({'status': 500})
+        elif (self.path == '/' or self.path == '/index.html'):
+            self.respond({'status': 200})
         else:
             self.respond({'status': 500})
 
     def handle_http(self, status_code, path):
         self.send_response(status_code)
-        self.send_header('Content-type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
+        if (self.path == '/' or self.path == '/index.html'):
+            self.send_header('Content-type',    'text/html')
+        else:
+            self.send_header('Content-type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
         
         if (self.stationHourRegex.match(self.path)):
@@ -78,6 +83,10 @@ class ReqHandler(BaseHTTPRequestHandler):
                 content = self.controller.getHistoryAvailabilityPredictionForOneStation(stationid, timestamp)
             else:
                 content = 'Unknown station id.'
+        elif (self.path == '/' or self.path == '/index.html'):
+                f = open(curdir + sep + 'index.html') 
+                content = f.read()
+                f.close()
         else:
             content = 'Request path malformed or not defined.'
         
