@@ -88,7 +88,8 @@ def parseAndWriteWeatherForecast(response):
     df_weatherPred.columns = ['Time','RainAmountPred','TemperaturePred']
 
     # Write to csv, both timestamped version and replace current
-    df_weatherPred.to_csv(WEATHERFORECASTOUTFILE, index=False)
+    # Disabled: write forecast to a timestamped file. Uncomment next line to enable.
+    #df_weatherPred.to_csv(WEATHERFORECASTOUTFILE, index=False)
     df_weatherPred.to_csv(CURRENTWEATHERFORECASTFILE, index=False)
     print('Latest weather forecast fetched.')
 

@@ -31,7 +31,8 @@ def createPrediction(currentWeatherData, preds):
     # Add timestamp column to the predsDF table
     predsDF.insert(0,'Time', currentWeatherData.loc[0:25,'Time'])
 
-    predsDF.to_csv(AVAILABILITYFORECASTOUTFILE, index=False)
+    # Disabled: write bike availability forecast to a timestamped file. Uncomment next line to enable.
+    #predsDF.to_csv(AVAILABILITYFORECASTOUTFILE, index=False)
     predsDF.to_csv(CURRENTAVAILABILITYFORECASTFILE, index=False)
     print('Prediction created.')
 
