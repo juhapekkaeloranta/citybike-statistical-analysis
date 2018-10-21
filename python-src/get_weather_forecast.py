@@ -5,18 +5,17 @@ from xml.etree import ElementTree as ET
 import urllib
 import socket
 import datetime
+from dotenv import load_dotenv, find_dotenv
 
-def getFmiApiKey(f):
-    return os.environ["FMI_API_KEY"]
-    #root = ET.parse(f).getroot()
-    #return root.find('fmi-api-key').text
-
+def getFmiApiKey():
+    load_dotenv(find_dotenv())
+    return os.getenv("FMI_API_KEY")
+    
 WEATHERLOCATION = 'kaisaniemi,helsinki'
-FMIAPIKEYSOURCE = 'env'
 WEATHERFORECASTOUTFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
 CURRENTWEATHERFORECASTFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-current.csv'
 REQUESTURL = 'http://data.fmi.fi/fmi-apikey/' \
-           + getFmiApiKey(FMIAPIKEYSOURCE) + '/' \
+           + str(getFmiApiKey()) + '/' \
            + 'wfs?request=getFeature&storedquery_id=' \
            + 'fmi::forecast::harmonie::surface::point::timevaluepair' \
            + '&place=' + WEATHERLOCATION
@@ -36,7 +35,6 @@ def fetchAndWriteWeatherForecast():
     Write the forecast in the folder /prediction in a timestamp-named file.
     """
     print('\nFetching latest weather forecast from FMI API...')
-    
     req = urllib.request.Request(REQUESTURL)
     
     try:
