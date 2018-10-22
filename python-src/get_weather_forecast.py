@@ -35,14 +35,16 @@ REQUESTURL_OBSERVATIONS = 'http://data.fmi.fi/fmi-apikey/' \
            + '&place=' + WEATHERLOCATION \
            + '&timestep=' + TIMESTEP + '&'
 
-# Helper functions
-def parser(item1,item2):
-    return item1.text,item2.text
-
-def parse_one_series(series):
-    return [parser(item1,item2) for item1,item2 in \
-        zip(series.iter(tag='{http://www.opengis.net/waterml/2.0}time'), \
-            series.iter(tag='{http://www.opengis.net/waterml/2.0}value'))]
+def fetchAndWriteWeatherObservationsAndForecast():
+    """Fetch weather observations for last 12 hours and weather forecast
+    for the next 24 h for Helsinki Kaisaniemi from FMI API.
+    Write the data in the folder /prediction in currents files."""
+    successForec = fetchAndWriteWeatherData(WeatherDataType.FORECAST)
+    successObser = fetchAndWriteWeatherData(WeatherDataType.OBSERVATIONS)
+    if (successForec and successObser):
+        return True
+    else:
+        return False
 
 def fetchAndWriteWeatherData(weatherDataType):
     """Fetch weather data for Helsinki Kaisaniemi from FMI API.
@@ -64,8 +66,7 @@ def fetchAndWriteWeatherData(weatherDataType):
     else:
         raise TypeError('Parameter weatherDataType must be an instance of WeatherDataType Enum')
 
-    print('\nFetching latest weather data of type' + str(weatherDataType) +' from FMI API...')
-    print('Req URL: ', request_url)
+    print('\nFetching latest weather data of type ' + str(weatherDataType) +' from FMI API...')
     req = urllib.request.Request(request_url)
     
     try:
@@ -122,7 +123,15 @@ def parseAndWriteWeatherData(response, temp_attrib, rain_attrib, outfile_timesta
     df_weatherData.to_csv(outfile_current, index=False)
     print('Latest weather data fetched.')
 
+# Helper functions
+def parser(item1,item2):
+    return item1.text,item2.text
+
+def parse_one_series(series):
+    return [parser(item1,item2) for item1,item2 in \
+        zip(series.iter(tag='{http://www.opengis.net/waterml/2.0}time'), \
+            series.iter(tag='{http://www.opengis.net/waterml/2.0}value'))]
+
 if __name__ == "__main__":
     # Execute the fetcher-writer method for both forecast and observations
-    fetchAndWriteWeatherData(WeatherDataType.FORECAST)
-    fetchAndWriteWeatherData(WeatherDataType.OBSERVATIONS)
+    fetchAndWriteWeatherObservationsAndForecast()

@@ -3,8 +3,8 @@ import os, sys
 import pandas as pd
 import datetime
 
-from get_weather_forecast import CURRENTWEATHERFORECASTFILE, fetchAndWriteWeatherData, WeatherDataType
-from bike_availability_predictions_from_weather_forecast import CURRENTAVAILABILITYFORECASTFILE, HISTORICALAVAILABILITYFORECASTFILE, createPrediction, createHistoricalPrediction
+from get_weather_forecast import CURRENTWEATHERFORECASTFILE, CURRENTWEATHEROBSERVATIONSFILE, WeatherDataType, fetchAndWriteWeatherObservationsAndForecast
+from bike_availability_predictions_from_weather_forecast import CURRENTAVAILABILITYFORECASTFILE, CURRENTOLDAVAILABILITYFORECASTFILE, HISTORICALAVAILABILITYFORECASTFILE, createPrediction, createHistoricalPrediction, ForecastType
 from convert_weatherdata_to_historical_forecast import HISTORYWEATHERFORECASTOUTFILE
 from model import readStationDataAndTrainPredictors
 import read_history_data
@@ -33,6 +33,13 @@ class Controller():
 
     def readCurrentAvailabilityPrediction(self):
         return pd.read_csv(CURRENTAVAILABILITYFORECASTFILE)
+
+    def readCurrentCombinedAvailabilityPrediction(self):
+        current = pd.read_csv(CURRENTAVAILABILITYFORECASTFILE)
+        current = current.iloc[0:13]
+        old = pd.read_csv(CURRENTOLDAVAILABILITYFORECASTFILE)
+        old = old.iloc[0:12]
+        return (pd.concat([old, current], ignore_index=True))
         
     def readHistoricalAvailabilityPrediction(self):
         return pd.read_csv(HISTORICALAVAILABILITYFORECASTFILE)
@@ -67,13 +74,16 @@ class Controller():
         if (timeFromLastUpdate > INTERVAL_FOR_NEW_PREDICTIONS):
             print('Updating predictions...')
             # Fetch latest weather forecast, write it to disk and read it back in
-            fetchSuccess = fetchAndWriteWeatherData(WeatherDataType.FORECAST)
+            fetchSuccess = fetchAndWriteWeatherObservationsAndForecast()
             
             if fetchSuccess:
                 currentWeatherPred = pd.read_csv(CURRENTWEATHERFORECASTFILE)
-            
-                # Create stationwise predictions for the next 24 hours and write them to disk
-                createPrediction(currentWeatherPred, self.predictors)
+                currentObservations = pd.read_csv(CURRENTWEATHEROBSERVATIONSFILE)
+                oldWeatherPred = pd.concat([currentObservations, currentWeatherPred], ignore_index=True)
+                
+                # Create stationwise predictions and write them to disk
+                createPrediction(currentWeatherPred, self.predictors, ForecastType.CURRENT)
+                createPrediction(oldWeatherPred, self.predictors, ForecastType.TWELVEHOURSOLD)
                 self.latestPredictionUpdateTime = datetime.datetime.now()
                 print('Predictions updated.')
             else:
