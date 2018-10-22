@@ -1,9 +1,9 @@
 import pandas as pd
 import sys, os
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 import datetime
-import seaborn as sns
+#import seaborn as sns
 import read_history_data as rhd
 import conversion
 
