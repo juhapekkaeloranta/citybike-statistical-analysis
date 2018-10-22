@@ -3,7 +3,7 @@ import os, sys
 import pandas as pd
 import datetime
 
-from get_weather_forecast import CURRENTWEATHERFORECASTFILE, fetchAndWriteWeatherForecast
+from get_weather_forecast import CURRENTWEATHERFORECASTFILE, fetchAndWriteWeatherData, WeatherDataType
 from bike_availability_predictions_from_weather_forecast import CURRENTAVAILABILITYFORECASTFILE, HISTORICALAVAILABILITYFORECASTFILE, createPrediction, createHistoricalPrediction
 from convert_weatherdata_to_historical_forecast import HISTORYWEATHERFORECASTOUTFILE
 from model import readStationDataAndTrainPredictors
@@ -67,7 +67,7 @@ class Controller():
         if (timeFromLastUpdate > INTERVAL_FOR_NEW_PREDICTIONS):
             print('Updating predictions...')
             # Fetch latest weather forecast, write it to disk and read it back in
-            fetchSuccess = fetchAndWriteWeatherForecast()
+            fetchSuccess = fetchAndWriteWeatherData(WeatherDataType.FORECAST)
             
             if fetchSuccess:
                 currentWeatherPred = pd.read_csv(CURRENTWEATHERFORECASTFILE)

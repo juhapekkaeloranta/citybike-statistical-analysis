@@ -5,21 +5,34 @@ from xml.etree import ElementTree as ET
 import urllib
 import socket
 import datetime
+from enum import Enum
 
 def getFmiApiKey(f):
     root = ET.parse(f).getroot()
     return root.find('fmi-api-key').text
 
+class WeatherDataType(Enum):
+    FORECAST = 'forecast'
+    OBSERVATIONS = 'observations'
+
 WEATHERLOCATION = 'kaisaniemi,helsinki'
-FMIAPIKEYSOURCE = 'env'
+TIMESTEP = '60'
 WEATHERFORECASTOUTFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
 CURRENTWEATHERFORECASTFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-current.csv'
-REQUESTURL = 'http://data.fmi.fi/fmi-apikey/' \
+WEATHEROBSERVATIONSOUTFILE = 'prediction/weatherobservations-HelsinkiKaisaniemi-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
+CURRENTWEATHEROBSERVATIONSFILE = 'prediction/weatherobservations-HelsinkiKaisaniemi-current.csv'
+REQUESTURL_FORECAST = 'http://data.fmi.fi/fmi-apikey/' \
            + getFmiApiKey(FMIAPIKEYSOURCE) + '/' \
            + 'wfs?request=getFeature&storedquery_id=' \
            + 'fmi::forecast::harmonie::surface::point::timevaluepair' \
            + '&place=' + WEATHERLOCATION
 
+REQUESTURL_OBSERVATIONS = 'http://data.fmi.fi/fmi-apikey/' \
+           + getFmiApiKey(FMIAPIKEYSOURCE) + '/' \
+           + 'wfs?request=getFeature&storedquery_id=' \
+           + 'fmi::observations::weather::timevaluepair' \
+           + '&place=' + WEATHERLOCATION \
+           + '&timestep=' + TIMESTEP + '&'
 
 # Helper functions
 def parser(item1,item2):
@@ -30,24 +43,40 @@ def parse_one_series(series):
         zip(series.iter(tag='{http://www.opengis.net/waterml/2.0}time'), \
             series.iter(tag='{http://www.opengis.net/waterml/2.0}value'))]
 
-def fetchAndWriteWeatherForecast():
-    """Fetch the current weather forecast for Helsinki Kaisaniemi from FMI API.
-    Write the forecast in the folder /prediction in a timestamp-named file.
+def fetchAndWriteWeatherData(weatherDataType):
+    """Fetch weather data for Helsinki Kaisaniemi from FMI API.
+    Write the data in the folder /prediction in a timestamp-named file.
+    Takes parameter 'forecast' or 'observations'
     """
-    print('\nFetching latest weather forecast from FMI API...')
+    print('\nFetching latest weather data from FMI API...')
     
-    req = urllib.request.Request(REQUESTURL)
+    if (weatherDataType == WeatherDataType.FORECAST):
+        temp_attrib = 'mts-1-1-Temperature'
+        rain_attrib = 'mts-1-1-PrecipitationAmount'
+        outfile_timestamp = WEATHERFORECASTOUTFILE
+        outfile_current = CURRENTWEATHERFORECASTFILE
+        request_url = REQUESTURL_FORECAST
+    elif (weatherDataType == WeatherDataType.FORECAST):
+        temp_attrib = 'obs-obs-1-1-t2m'
+        rain_attrib = 'obs-obs-1-1-r_1h'
+        outfile_timestamp = WEATHEROBSERVATIONSOUTFILE
+        outfile_current = CURRENTWEATHEROBSERVATIONSFILE
+        request_url = REQUESTURL_OBSERVATIONS
+    else:
+        raise TypeError('Parameter weatherDataType must be an instance of WeatherDataType Enum')
+
+    req = urllib.request.Request(request_url)
     
     try:
         response = urllib.request.urlopen(req, timeout=10)
-        parseAndWriteWeatherForecast(response)
+        parseAndWriteWeatherData(response, temp_attrib, rain_attrib, outfile_timestamp, outfile_current)
         return True
     except socket.timeout:
-        print('Latest weather forecast could not be fetched, using old data.')
+        print('Latest weather data could not be fetched, using old data.')
         print('socket timed out - URL %s', req)
         return False
     except urllib.error.URLError as e:
-        print('Latest weather forecast could not be fetched, using old data.')
+        print('Latest weather data could not be fetched, using old data.')
         """ if isinstance(e.reason, socket.timeout):
             print('  Socket timed out - URL %s', req) """
         if hasattr(e, 'reason'):
@@ -55,22 +84,22 @@ def fetchAndWriteWeatherForecast():
             print('  Reason: ', e.reason)
             
         elif hasattr(e, 'code'):
-            print('Latest weather forecast could not be fetched, using old data.')
+            print('Latest weather data could not be fetched, using old data.')
             print('  The FMI server couldn\'t fulfill the request.')
             print('  Error code: ', e.code)
             
         return False
    
-def parseAndWriteWeatherForecast(response):
-    """Submethod of fetchAndWriteWeatherForecast."""
+def parseAndWriteWeatherData(response, temp_attrib, rain_attrib, outfile_timestamp, outfile_current):
+    """Submethod of fetchAndWriteWeatherData."""
     tree = ET.parse(response)
     root = tree.getroot()
 
     measurementElements = root.findall('.//{http://www.opengis.net/waterml/2.0}MeasurementTimeseries')
     for el in measurementElements:
-        if (el.attrib['{http://www.opengis.net/gml/3.2}id'] == 'mts-1-1-Temperature'):
+        if (el.attrib['{http://www.opengis.net/gml/3.2}id'] == temp_attrib):
             temperatureSeries = el
-        elif (el.attrib['{http://www.opengis.net/gml/3.2}id'] == 'mts-1-1-PrecipitationAmount'):
+        elif (el.attrib['{http://www.opengis.net/gml/3.2}id'] == rain_attrib):
             rainAmountSeries = el
 
     temperatureData = zip(*(parse_one_series(temperatureSeries)))
@@ -81,16 +110,17 @@ def parseAndWriteWeatherForecast(response):
 
     # Put the data into pandas a dataframe
     df_temperature = pd.DataFrame(temperatureDataList).T
-    df_weatherPred = pd.DataFrame(rainDataList).T
+    df_weatherData = pd.DataFrame(rainDataList).T
 
-    df_weatherPred[2] = df_temperature[1]
-    df_weatherPred.columns = ['Time','RainAmountPred','TemperaturePred']
+    df_weatherData[2] = df_temperature[1]
+    df_weatherData.columns = ['Time','RainAmountPred','TemperaturePred']
 
     # Write to csv, both timestamped version and replace current
-    df_weatherPred.to_csv(WEATHERFORECASTOUTFILE, index=False)
-    df_weatherPred.to_csv(CURRENTWEATHERFORECASTFILE, index=False)
-    print('Latest weather forecast fetched.')
+    df_weatherData.to_csv(outfile_timestamp, index=False)
+    df_weatherData.to_csv(outfile_current, index=False)
+    print('Latest weather data fetched.')
 
 if __name__ == "__main__":
-    # Execute the fetcher-writer method
-    fetchAndWriteWeatherForecast()
+    # Execute the fetcher-writer method for both forecast and observations
+    fetchAndWriteWeatherData(WeatherDataType.FORECAST)
+    fetchAndWriteWeatherData(WeatherDataType.OBSERVATIONS)
