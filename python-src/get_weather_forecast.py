@@ -8,9 +8,9 @@ import datetime
 from dotenv import load_dotenv, find_dotenv
 from enum import Enum
 
-def getFmiApiKey(f):
-    root = ET.parse(f).getroot()
-    return root.find('fmi-api-key').text
+def getFmiApiKey():
+    load_dotenv(find_dotenv())
+    return os.getenv("FMI_API_KEY")
 
 class WeatherDataType(Enum):
     FORECAST = 'forecast'
@@ -29,7 +29,7 @@ REQUESTURL_FORECAST = 'http://data.fmi.fi/fmi-apikey/' \
            + '&place=' + WEATHERLOCATION
 
 REQUESTURL_OBSERVATIONS = 'http://data.fmi.fi/fmi-apikey/' \
-           + getFmiApiKey(FMIAPIKEYSOURCE) + '/' \
+           + str(getFmiApiKey()) + '/' \
            + 'wfs?request=getFeature&storedquery_id=' \
            + 'fmi::observations::weather::timevaluepair' \
            + '&place=' + WEATHERLOCATION \
@@ -49,15 +49,13 @@ def fetchAndWriteWeatherData(weatherDataType):
     Write the data in the folder /prediction in a timestamp-named file.
     Takes parameter 'forecast' or 'observations'
     """
-    print('\nFetching latest weather data from FMI API...')
-    
     if (weatherDataType == WeatherDataType.FORECAST):
         temp_attrib = 'mts-1-1-Temperature'
         rain_attrib = 'mts-1-1-PrecipitationAmount'
         outfile_timestamp = WEATHERFORECASTOUTFILE
         outfile_current = CURRENTWEATHERFORECASTFILE
         request_url = REQUESTURL_FORECAST
-    elif (weatherDataType == WeatherDataType.FORECAST):
+    elif (weatherDataType == WeatherDataType.OBSERVATIONS):
         temp_attrib = 'obs-obs-1-1-t2m'
         rain_attrib = 'obs-obs-1-1-r_1h'
         outfile_timestamp = WEATHEROBSERVATIONSOUTFILE
@@ -66,6 +64,8 @@ def fetchAndWriteWeatherData(weatherDataType):
     else:
         raise TypeError('Parameter weatherDataType must be an instance of WeatherDataType Enum')
 
+    print('\nFetching latest weather data of type' + str(weatherDataType) +' from FMI API...')
+    print('Req URL: ', request_url)
     req = urllib.request.Request(request_url)
     
     try:
