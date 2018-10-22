@@ -2,6 +2,12 @@
 
 Project for "Introduction to Data Science" -course.
 
+### Related repositories
+[Frontend](https://github.com/mikkokotola/citybike-front/) for the citybike predictor app is a separate repository. This repository contains backend code.
+
+### Deployment
+Frontend is deployed at [https://citybike-pred.herokuapp.com/](https://citybike-pred.herokuapp.com/). The frontend uses the python backend deployed at [https://citybike-helsinki-predictor.herokuapp.com/](https://citybike-helsinki-predictor.herokuapp.com/).
+
 ### Project plan
 [Project plan](https://docs.google.com/document/d/1X3f5UQMo5cpXqYQnJM6-z-aw4sNIrAeuVKdYuzaYq7E/edit?usp=sharing) (preliminary) in google docs.
 
@@ -31,17 +37,22 @@ Server will start on `localhost:3001`
 
 ### Frontend
 
-1. Start a local webserver to serve html and js files
+NOTE: frontend is in a different repository: [Citybike-front](https://github.com/mikkokotola/citybike-front).
+
+1. Go to frontend repository root and start a local webserver to serve html and js files
 
 ```
 python3 -m http.server
 ```
 
 2. Open browser from localhost:8000
+3. Click on home.html
+
+NOTE: the frontend uses the Heroku-deployed backend. If you want to use a locally run backend, change the first line in js-src/plotter.js to const baseUrl = 'http://localhost:3001'
 
 ## Server API
 
-The server currently serves 24 hour availability prediction data in JSON format at http://localhost:3001 with the following (REST-type) paths:
+The server currently serves 24 hour availability prediction data in JSON format at http://localhost:3001 (local mode) and https://citybike-helsinki-predictor.herokuapp.com (Heroku deployment) with the following (REST-type) paths:
 
 Predictions for all stations for 24 h :
 /prediction

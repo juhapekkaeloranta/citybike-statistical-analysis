@@ -5,6 +5,7 @@ from xml.etree import ElementTree as ET
 import urllib
 import socket
 import datetime
+from dotenv import load_dotenv, find_dotenv
 from enum import Enum
 
 def getFmiApiKey(f):
@@ -22,7 +23,7 @@ CURRENTWEATHERFORECASTFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-curr
 WEATHEROBSERVATIONSOUTFILE = 'prediction/weatherobservations-HelsinkiKaisaniemi-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
 CURRENTWEATHEROBSERVATIONSFILE = 'prediction/weatherobservations-HelsinkiKaisaniemi-current.csv'
 REQUESTURL_FORECAST = 'http://data.fmi.fi/fmi-apikey/' \
-           + getFmiApiKey(FMIAPIKEYSOURCE) + '/' \
+           + str(getFmiApiKey()) + '/' \
            + 'wfs?request=getFeature&storedquery_id=' \
            + 'fmi::forecast::harmonie::surface::point::timevaluepair' \
            + '&place=' + WEATHERLOCATION
@@ -116,7 +117,8 @@ def parseAndWriteWeatherData(response, temp_attrib, rain_attrib, outfile_timesta
     df_weatherData.columns = ['Time','RainAmountPred','TemperaturePred']
 
     # Write to csv, both timestamped version and replace current
-    df_weatherData.to_csv(outfile_timestamp, index=False)
+    # Disabled: write forecast to a timestamped file. Uncomment next line to enable.
+    #df_weatherData.to_csv(outfile_timestamp, index=False)
     df_weatherData.to_csv(outfile_current, index=False)
     print('Latest weather data fetched.')
 
