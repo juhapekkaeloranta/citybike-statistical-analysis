@@ -83,8 +83,15 @@ def fetchSeriesOfFiles(timeStrs):
     aggregateDf = pd.DataFrame(columns=['stationid', 'time', 'avlbikes'])
     dirFileList = fetchDirectoryFileList()
     for timeStr in timeStrs:
-        timeStrRegEx = regexFromTimeStr(timeStr)     
-        fileNameMatch = timeStrRegEx.search(dirFileList).group()
+        digits = 1
+        searchResult = None
+        while (digits <=4 and not searchResult):
+            timeStrRegEx = regexFromTimeStr(timeStr, digits)
+            searchResult = timeStrRegEx.search(dirFileList)
+            digits += 1
+        if not searchResult:
+            continue
+        fileNameMatch = searchResult.group()
         results = fetchSingleFile(fileNameMatch)
         if results:
             results = results['result']
@@ -93,8 +100,8 @@ def fetchSeriesOfFiles(timeStrs):
     aggregateDf.sort_values(by=['time', 'stationid'], axis=0)
     return aggregateDf
 
-def regexFromTimeStr(timeStr):
-    return re.compile(timeStr[:13] + '\d\dZ')
+def regexFromTimeStr(timeStr, digits):
+    return re.compile(timeStr[:15-digits] + '\d{' + str(digits) + '}Z')
 
 def singleResultToDataframe(results, timeStr):
     df = pd.DataFrame(columns=['stationid', 'time', 'avlbikes'])

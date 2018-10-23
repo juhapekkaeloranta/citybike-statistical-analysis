@@ -46,7 +46,7 @@ def fetchAndWriteWeatherObservationsAndForecast():
     else:
         return False
 
-def fetchAndWriteWeatherData(weatherDataType):
+def fetchAndWriteWeatherData(weatherDataType=WeatherDataType.FORECAST):
     """Fetch weather data for Helsinki Kaisaniemi from FMI API.
     Write the data in the folder /prediction in a timestamp-named file.
     Takes parameter 'forecast' or 'observations'

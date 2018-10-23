@@ -171,6 +171,21 @@ class Controller():
         bikeAvailabilityHistory = bikeAvailabilityHistory.reset_index(drop=True)
         return bikeAvailabilityHistory
     
+    def getCombinedPredictionForOneStation(self, stationid):
+        """Returns combined prediction for one station for +-12 hours in JSON format
+        with each object a single prediction for station id and time. Includes actual data 
+        from -12 hours to given time. Note: get_current_availability.py
+        is not called and is assumed to be up to date (running as a separate background process.)"""
+
+        stationid = str(stationid) 
+
+        self.updateWeatherAndAvailabilityPredictions()
+        currentPrediction = self.readCurrentCombinedAvailabilityPrediction()
+        currentPrediction = currentPrediction[['Time', stationid]]
+        currentPrediction[stationid] = currentPrediction[stationid].round(2)
+        currentPredictionJSON = json.dumps(self.convertPredictionToJSON(currentPrediction))
+        return currentPredictionJSON
+
     def getHistoryAvailabilityPredictionForOneStation(self, stationidStr, centreTime):
         """Returns historical availability prediction for one station for +-12 hours from given time in JSON format
         with each object a single prediction for station id and time. Includes actual data from -12 hours to given time."""
@@ -214,6 +229,8 @@ def main():
     print('\nBackend started from controller.py.')
     controller = Controller()
     
+    print('Current combined:\n', controller.getCombinedPredictionForOneStation(2))
+    print('\nHistorical combined:\n', controller.getHistoryAvailabilityPredictionForOneStation("2", "2017-06-12T22:00:00Z"))
     # Get availability forecasts for all stations for the next 24 hours.
     #pred = controller.getAvailabilityPredictionForAllStations()
     
