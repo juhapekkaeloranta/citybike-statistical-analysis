@@ -6,6 +6,7 @@ import socket
 import datetime
 import json
 import constants
+import conversion
 import re
 
 PASTAVAILABILITYOUTFILE = 'prediction/pastavailabilities-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
@@ -28,7 +29,8 @@ def fetchAndWriteCurrentAvailability():
         timeStrs.append(formatTimeStringToHSL(times[x]))
 
     df = fetchSeriesOfFiles(timeStrs)
-        
+    df['time'] = df['time'].apply(lambda t: conversion.getUTCTimeStampFromTimeStampString(str(t)))
+    
     # Write to csv
     # Disabled: write out timestamped past availability file. Uncomment next line to enable.
     #df.to_csv(PASTAVAILABILITYOUTFILE, index=False)
@@ -101,7 +103,7 @@ def fetchSeriesOfFiles(timeStrs):
     return aggregateDf
 
 def regexFromTimeStr(timeStr, digits):
-    return re.compile(timeStr[:15-digits] + '\d{' + str(digits) + '}Z')
+    return (re.compile(timeStr[:(15-digits)] + r'\d{' + str(digits) + '}Z'))
 
 def singleResultToDataframe(results, timeStr):
     df = pd.DataFrame(columns=['stationid', 'time', 'avlbikes'])
@@ -148,4 +150,3 @@ def fetchDirectoryFileList():
 if __name__ == "__main__":
     # Execute the fetcher-writer method
     fetchAndWriteCurrentAvailability()
-    #fetchDirectoryFileList()

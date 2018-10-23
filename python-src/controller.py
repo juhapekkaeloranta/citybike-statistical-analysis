@@ -2,6 +2,7 @@ import csv, json
 import os, sys
 import pandas as pd
 import datetime
+import re
 
 from get_weather_forecast import CURRENTWEATHERFORECASTFILE, CURRENTWEATHEROBSERVATIONSFILE, WeatherDataType, fetchAndWriteWeatherObservationsAndForecast
 from bike_availability_predictions_from_weather_forecast import CURRENTAVAILABILITYFORECASTFILE, CURRENTOLDAVAILABILITYFORECASTFILE, HISTORICALAVAILABILITYFORECASTFILE, createPrediction, createHistoricalPrediction, ForecastType
@@ -9,8 +10,8 @@ from convert_weatherdata_to_historical_forecast import HISTORYWEATHERFORECASTOUT
 from model import readStationDataAndTrainPredictors
 import read_history_data
 import conversion
+import get_current_availability
 
-AVAIL_CURRENT_FILE = 'data/01-raw-datadummystations_20181001T040001Z.json'
 INTERVAL_FOR_NEW_PREDICTIONS = 60 # in seconds
 
 class Controller():
@@ -44,6 +45,9 @@ class Controller():
     def readHistoricalAvailabilityPrediction(self):
         return pd.read_csv(HISTORICALAVAILABILITYFORECASTFILE)
     
+    def read12HAvailabilityData(self):
+        return pd.read_csv(get_current_availability.CURRENTPASTAVAILABILITYFILE)
+    
     def createHistoricalAvailabilityPrediction(self):
         historyWeatherPred = pd.read_csv(HISTORYWEATHERFORECASTOUTFILE)
         createHistoricalPrediction(historyWeatherPred, self.predictors)
@@ -54,6 +58,13 @@ class Controller():
         endDateTime = centreDateTime + datetime.timedelta(hours=12)
         return startDateTime, centreDateTime, endDateTime
 
+    def get12HAvailabilityForOneStation(self, stationid):
+        bikeAvailability12H = self.read12HAvailabilityData()
+        #print('Bikes12h:\n', bikeAvailability12H)
+        bikeAvailability12H = bikeAvailability12H[(bikeAvailability12H.stationid == int(stationid))]
+        bikeAvailability12H = bikeAvailability12H.reset_index(drop=True)
+        return bikeAvailability12H
+    
     def createSingleJSONObject(self, stationid, time, avlBikes):
         JSONItem = {}
         JSONItem["stationid"] = stationid
@@ -181,9 +192,24 @@ class Controller():
 
         self.updateWeatherAndAvailabilityPredictions()
         currentPrediction = self.readCurrentCombinedAvailabilityPrediction()
-        currentPrediction = currentPrediction[['Time', stationid]]
-        currentPrediction[stationid] = currentPrediction[stationid].round(2)
-        currentPredictionJSON = json.dumps(self.convertPredictionToJSON(currentPrediction))
+        bikeAvailability12H = self.get12HAvailabilityForOneStation(str(stationid))
+        
+        currentPrediction = currentPrediction[['Time', str(stationid)]]
+        
+        # Merge the data into one dataframe and reformat to match API requirements
+        combined = pd.merge(left=currentPrediction, left_on='Time', right=bikeAvailability12H, right_on='time', how='outer',)
+        combined = combined.drop(columns=['time'])
+        combined = combined.rename(index=str, columns={str(stationid): "prediction"})
+
+        combined['stationid'].fillna(stationid, inplace=True)
+        combined['avlbikes'].fillna(-1, inplace=True)
+        combined['avlbikes'].replace({-1: None}, inplace=True)
+        combined = combined[pd.notnull(combined['Time'])]
+        
+        combined['stationid'] = combined['stationid'].astype(int, inplace=True).apply(str)
+        combined['prediction'] = combined['prediction'].round(2)
+
+        currentPredictionJSON = json.dumps(self.convertCombinedToJSON(combined))
         return currentPredictionJSON
 
     def getHistoryAvailabilityPredictionForOneStation(self, stationidStr, centreTime):
@@ -229,8 +255,10 @@ def main():
     print('\nBackend started from controller.py.')
     controller = Controller()
     
-    print('Current combined:\n', controller.getCombinedPredictionForOneStation(2))
+    # Get current combined availability prediction +-12 h
+    print('Current combined:\n', controller.getCombinedPredictionForOneStation("2"))
     print('\nHistorical combined:\n', controller.getHistoryAvailabilityPredictionForOneStation("2", "2017-06-12T22:00:00Z"))
+    
     # Get availability forecasts for all stations for the next 24 hours.
     #pred = controller.getAvailabilityPredictionForAllStations()
     

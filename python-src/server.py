@@ -15,7 +15,8 @@ PORT_NUMBER = int(os.getenv("PORT") or 3001)
 class ReqHandler(BaseHTTPRequestHandler):
     stationRegex = re.compile('/prediction/\d+')
     stationHourRegex = re.compile('/prediction/\d+/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ')
-    historyStationHourRegex = re.compile('/combined/\d+/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ')
+    combinedRegex = re.compile('/combined/\d+')
+    combinedStationHourRegex = re.compile('/combined/\d+/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ')
     
     def initiateController(self):
         self.controller = controller.Controller()
@@ -41,9 +42,15 @@ class ReqHandler(BaseHTTPRequestHandler):
                 self.respond({'status': 500})
         elif (self.path == '/prediction'):
             self.respond({'status': 200})
-        elif (self.historyStationHourRegex.match(self.path)):
+        elif (self.combinedStationHourRegex.match(self.path)):
             stationid = self.path.split('/')[2]
             timestamp = self.path.split('/')[3]
+            if (int(stationid) in constants.stationIds):
+                self.respond({'status': 200})
+            else:
+                self.respond({'status': 500})
+        elif (self.combinedRegex.match(self.path)):
+            stationid = self.path.split('/')[2]
             if (int(stationid) in constants.stationIds):
                 self.respond({'status': 200})
             else:
@@ -73,7 +80,13 @@ class ReqHandler(BaseHTTPRequestHandler):
                 content = 'Unknown station id.'
         elif (self.path == '/prediction'):
             content = self.controller.getAvailabilityPredictionForAllStations()
-        elif (self.historyStationHourRegex.match(self.path)):
+        elif (self.combinedRegex.match(self.path)):
+            stationid = self.path.split('/')[2]
+            if (int(stationid) in constants.stationIds):
+                content = self.controller.getCombinedPredictionForOneStation(stationid)
+            else:
+                content = 'Unknown station id.'
+        elif (self.combinedStationHourRegex.match(self.path)):
             stationid = self.path.split('/')[2]
             timestamp = self.path.split('/')[3]
             if (int(stationid) in constants.stationIds):
