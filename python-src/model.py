@@ -35,8 +35,10 @@ class BikeAvailabilityPredictor:
         return return_val
 
 def readStationDataAndTrainPredictors():
+    print('  Reading in historical weather and bike data for model training...')
     weatherData = rhd.readWeatherData()
     stationData = rhd.readBikeData()
+    print('  Historical weather and bike data read.')
 
     # Convert time to actual timestamps
     stationData['time'] = stationData['time'].apply(lambda t: conversion.getTimeStampFromBikedataTimeHour(t))
@@ -97,7 +99,7 @@ def readStationDataAndTrainPredictors():
                 p_coeffsHours = [np.mean(singleStation['avlbikes'].values[avlbikes_idx])]
             predictors[i] = BikeAvailabilityPredictor(p_coeffsTemp, p_coeffsRain, p_coeffsHours, max(singleStation['avlbikes'].values[avlbikes_idx]))
 
-
+    print('  Model training finished.')
     return predictors, weatherData, stationData
     # end of readStationDataAndTrainPredictors()
 

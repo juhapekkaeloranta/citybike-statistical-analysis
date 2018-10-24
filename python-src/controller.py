@@ -3,6 +3,7 @@ import os, sys
 import pandas as pd
 import datetime
 import re
+import pickle
 
 from get_weather_forecast import CURRENTWEATHERFORECASTFILE, CURRENTWEATHEROBSERVATIONSFILE, WeatherDataType, fetchAndWriteWeatherObservationsAndForecast
 from bike_availability_predictions_from_weather_forecast import CURRENTAVAILABILITYFORECASTFILE, CURRENTOLDAVAILABILITYFORECASTFILE, HISTORICALAVAILABILITYFORECASTFILE, createPrediction, createHistoricalPrediction, ForecastType
@@ -12,11 +13,16 @@ import read_history_data
 import conversion
 import get_current_availability
 
+PREDICTORS_FILE = 'trainedModel/trainedPredictors.pkl'
 INTERVAL_FOR_NEW_PREDICTIONS = 60 # in seconds
 
 class Controller():
     def __init__(self):
-        self.predictors = self.createPredictionModel()
+        # If no ready predictor dill file is available, run these to create and write out a new file.
+        #self.predictors = self.createPredictionModel()
+        #self.writePredictorsToPickle()
+        
+        self.predictors = self.readPredictorsFromPickle()
         self.latestPredictionUpdateTime = datetime.datetime(2000, 1, 1)
         self.updateWeatherAndAvailabilityPredictions()
         self.latestPredictionUpdateTime = datetime.datetime.now()
@@ -24,13 +30,26 @@ class Controller():
         self.bikeAvailabilityHistory = {}
         self.historyLoaded = False
         pd.options.mode.chained_assignment = None
-        
+
     def createPredictionModel(self):
         """ Create stationwise prediction models, train them on historical data and return them """
         print('\nCreating model...')
         predictors, _ , _ = readStationDataAndTrainPredictors()
-        print('\nModel created and trained.')
+        print('Model created and trained.')
         return predictors
+    
+    def writePredictorsToPickle(self):
+        print('\nWriting predictors to pickle file...')
+        with open(PREDICTORS_FILE, 'wb') as f:
+            pickle.dump(self.predictors, f, pickle.HIGHEST_PROTOCOL)
+        print('Predictors written to pickle file ', PREDICTORS_FILE)
+    
+    def readPredictorsFromPickle(self):
+        print('\nReading predictors from pickle file ', PREDICTORS_FILE, '...')
+        with open(PREDICTORS_FILE, 'rb') as f:
+            preds = pickle.load(f)
+        print('\nPredictors read from pickle file.')
+        return preds
 
     def readCurrentAvailabilityPrediction(self):
         return pd.read_csv(CURRENTAVAILABILITYFORECASTFILE)
@@ -257,7 +276,6 @@ def main():
     
     # Get current combined availability prediction +-12 h
     print('Current combined:\n', controller.getCombinedPredictionForOneStation("2"))
-    print('\nHistorical combined:\n', controller.getHistoryAvailabilityPredictionForOneStation("2", "2017-06-12T22:00:00Z"))
     
     # Get availability forecasts for all stations for the next 24 hours.
     #pred = controller.getAvailabilityPredictionForAllStations()
