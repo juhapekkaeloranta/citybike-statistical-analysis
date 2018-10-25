@@ -11,10 +11,10 @@ from convert_weatherdata_to_historical_forecast import HISTORYWEATHERFORECASTOUT
 from model import readStationDataAndTrainPredictors
 import read_history_data
 import conversion
-import get_current_availability
+from get_current_availability import fetchAndWriteCurrentAvailability
 
 PREDICTORS_FILE = 'trainedModel/trainedPredictors.pkl'
-INTERVAL_FOR_NEW_PREDICTIONS = 60 # in seconds
+INTERVAL_FOR_NEW_PREDICTIONS = 300 # in seconds
 
 class Controller():
     def __init__(self):
@@ -102,6 +102,10 @@ class Controller():
         timeFromLastUpdate = (datetime.datetime.now() - self.latestPredictionUpdateTime).total_seconds()
         print('Time difference from last update in seconds: ', timeFromLastUpdate)
         if (timeFromLastUpdate > INTERVAL_FOR_NEW_PREDICTIONS):
+            print('Fetching bike availability data...')
+            # Fetch latest bike availabilities for the last 12 hours
+            fetchAndWriteCurrentAvailability()
+            
             print('Updating predictions...')
             # Fetch latest weather forecast, write it to disk and read it back in
             fetchSuccess = fetchAndWriteWeatherObservationsAndForecast()
