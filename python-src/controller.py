@@ -14,7 +14,7 @@ import conversion
 import get_current_availability
 
 PREDICTORS_FILE = 'trainedModel/trainedPredictors.pkl'
-INTERVAL_FOR_NEW_PREDICTIONS = 60 # in seconds
+INTERVAL_FOR_NEW_PREDICTIONS = 180 # in seconds
 
 class Controller():
     def __init__(self):
@@ -102,6 +102,12 @@ class Controller():
         timeFromLastUpdate = (datetime.datetime.now() - self.latestPredictionUpdateTime).total_seconds()
         print('Time difference from last update in seconds: ', timeFromLastUpdate)
         if (timeFromLastUpdate > INTERVAL_FOR_NEW_PREDICTIONS):
+            
+            print('Updating current availabilies...')
+            # Fetch latest bike availabilities
+            get_current_availability.fetchAndWriteCurrentAvailability()
+            print('Current availabilies updated.')
+            
             print('Updating predictions...')
             # Fetch latest weather forecast, write it to disk and read it back in
             fetchSuccess = fetchAndWriteWeatherObservationsAndForecast()
