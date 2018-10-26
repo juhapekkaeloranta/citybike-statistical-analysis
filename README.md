@@ -77,7 +77,7 @@ NOTE: current combined predictions assume that script get_current_availability.p
 
 ## Model
 
-* The model is a "mixed model" consisting of a linear combination of different n-degree polynomials that were fit for each factor in relation to station bike-availability (factors: temperature, rain amount, hour of the day). The model is trained on data from 2018-08 and 2018-09.
+The model is a "mixed model" consisting of a linear combination of different n-degree polynomials that were fit for each factor in relation to station bike-availability (factors: temperature, rain amount, hour of the day). The model is trained on data from 2018-08 and 2018-09.
 
 ## Historical data available
 * Historical data includes months 2017-06, 2017-08, 2017-09, 2018-06, 2018-07, 2018-08 and 2018-09
