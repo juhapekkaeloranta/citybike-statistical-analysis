@@ -14,7 +14,8 @@ import conversion
 import get_current_availability
 
 PREDICTORS_FILE = 'trainedModel/trainedPredictors.pkl'
-INTERVAL_FOR_NEW_PREDICTIONS = 180 # in seconds
+INTERVAL_FOR_AVAILABILITY_DATA = 600 # in seconds
+INTERVAL_FOR_NEW_PREDICTIONS = 60 # in seconds
 
 class Controller():
     def __init__(self):
@@ -23,6 +24,7 @@ class Controller():
         #self.writePredictorsToPickle()
         
         self.predictors = self.readPredictorsFromPickle()
+        self.latestAvailabilityUpdateTime = datetime.datetime(2000, 1, 1)
         self.latestPredictionUpdateTime = datetime.datetime(2000, 1, 1)
         self.updateWeatherAndAvailabilityPredictions()
         self.latestPredictionUpdateTime = datetime.datetime.now()
@@ -99,24 +101,26 @@ class Controller():
         return predictionPoints
 
     def updateWeatherAndAvailabilityPredictions(self):
-        timeFromLastUpdate = (datetime.datetime.now() - self.latestPredictionUpdateTime).total_seconds()
-        print('Time difference from last update in seconds: ', timeFromLastUpdate)
-        if (timeFromLastUpdate > INTERVAL_FOR_NEW_PREDICTIONS):
-            
-            print('Updating current availabilies...')
-            # Fetch latest bike availabilities
-            get_current_availability.fetchAndWriteCurrentAvailability()
-            print('Current availabilies updated.')
-            
+        timeFromLastAvailabilityUpdate = (datetime.datetime.now() - self.latestAvailabilityUpdateTime).total_seconds()
+        print('Time difference from last bike availability update in seconds: ', timeFromLastAvailabilityUpdate, ', update interval: ', INTERVAL_FOR_AVAILABILITY_DATA, ' s.')
+        timeFromLastPredictionUpdate = (datetime.datetime.now() - self.latestPredictionUpdateTime).total_seconds()
+        print('Time difference from last weather prediction update in seconds: ', timeFromLastPredictionUpdate, ', update interval: ', INTERVAL_FOR_NEW_PREDICTIONS, ' s.')
+        
+        self.updateAvailability(timeFromLastAvailabilityUpdate)
+
+        self.updateWeatherForecastAndPredictions(timeFromLastPredictionUpdate)
+
+    def updateWeatherForecastAndPredictions(self, timeFromLastPredictionUpdate):
+        if (timeFromLastPredictionUpdate > INTERVAL_FOR_NEW_PREDICTIONS):
             print('Updating predictions...')
             # Fetch latest weather forecast, write it to disk and read it back in
             fetchSuccess = fetchAndWriteWeatherObservationsAndForecast()
-            
+
             if fetchSuccess:
                 currentWeatherPred = pd.read_csv(CURRENTWEATHERFORECASTFILE)
                 currentObservations = pd.read_csv(CURRENTWEATHEROBSERVATIONSFILE)
                 oldWeatherPred = pd.concat([currentObservations, currentWeatherPred], ignore_index=True)
-                
+
                 # Create stationwise predictions and write them to disk
                 createPrediction(currentWeatherPred, self.predictors, ForecastType.CURRENT)
                 createPrediction(oldWeatherPred, self.predictors, ForecastType.TWELVEHOURSOLD)
@@ -126,6 +130,16 @@ class Controller():
                 print('Predictions not updated.')
         else:
             print('No need to update predictions yet.')
+
+    def updateAvailability(self, timeFromLastAvailabilityUpdate):
+        if (timeFromLastAvailabilityUpdate > INTERVAL_FOR_AVAILABILITY_DATA):
+            print('Updating current availabilies...')
+            # Fetch latest bike availabilities
+            get_current_availability.fetchAndWriteCurrentAvailability()
+            self.latestAvailabilityUpdateTime = datetime.datetime.now()
+            print('Current availabilies updated.')
+        else:
+            print('No need to update availability data yet.')
 
     def getAvailabilityPredictionForAllStations(self):
         """Returns availability prediction for all stations for the next 24 hours in JSON format
