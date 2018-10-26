@@ -115,10 +115,10 @@ Vuosi,Kk,Pv,Klo,Aikavyöhyke,Sateen intensiteetti (mm/h),Ilman lämpötila (degC
 
 ```
 # Get weather forecast for Kaisaniemi, Helsinki for the next 24 h
-http://data.fmi.fi/fmi-apikey/keyhere/wfs?request=getFeature&storedquery_id=fmi::forecast::harmonie::surface::point::timevaluepair&place=kaisaniemi,helsinki
+http://data.fmi.fi/fmi-apikey/KEYHERE/wfs?request=getFeature&storedquery_id=fmi::forecast::harmonie::surface::point::timevaluepair&place=kaisaniemi,helsinki
 
 # Get weather observations for Kaisaniemi, Helsinki for the last 12 h in 60 minute steps
-http://data.fmi.fi/fmi-apikey/keyhere/wfs?request=getFeature&storedquery_id=fmi::observations::weather::timevaluepair&place=kaisaniemi,helsinki&timestep=60
+http://data.fmi.fi/fmi-apikey/KEYHERE/wfs?request=getFeature&storedquery_id=fmi::observations::weather::timevaluepair&place=kaisaniemi,helsinki&timestep=60
 ```
 The API calls provide XML that has is parsed and written into csv in similar format as the historical data.
 
@@ -127,9 +127,24 @@ For model creation the historical bike availability and weather data are read fr
 
 The trained model is written into a pickle file (in /trainedModel/) to avoid having to recreate and train the model at runtime. The trained model is simply read in runtime from the pickle file into memory. This improves performance especially on Heroku, where the dynos must restart the program after being inactive.
 
-## Step 6: Create predictions using the model and weather data for the last 12 hours
-The predictions are created in runtime... (To be continued)
+## Step 6: Upon request, create predictions using the model and weather data for the last 12 hours
+The predictions are created in runtime. The user clicks on a station and the frontend sends a station-specific request like https://citybike-helsinki-predictor.herokuapp.com/combined/2 to the backend. The backend
+* Wakes up from inactive state (in Heroku) (if dyno was inactive)
+* Loads predictors (model) from memory  (if dyno was inactive)
+* Updates the bike availability data for the last 12 h for all stations (if data over 10 min old)
+* Updates the weather observations for the last 12 h and weather prediction for the next 24 h (if data over 1 min old)
+* Creates availability predictions (using the model) for the last 12 h based on the weather observations and for the next 12 h based on the weather forecast - and combines these two into a combined prediction
+* Reads in the combined predictions and bike availability data and merges these into one Pandas dataframe
+* Filters the data by the requested station
+* For the requested station, returns the availability of the bikes in the last 12 h and the predicted availability both in the last 12 h and the next 12 h
 
+## Other kinds of predictions supported by the backend API
+* At /prediction, the 24 h availability predictions for all stations (no availability data)
+* At /prediction/2, the 24 h availability prediction for a single station (no availability data)
+* At /prediction/2/2018-10-21T14:00:00Z, the availability prediction for a single station at a single hour (within the next 24 h) (no availability data)
+* At /combined/8/2018-09-12T12:00:00Z, combined historical data (similar to the current combined but in the past) for the months 2017-06, 2017-07, 2017-08, 2018-06, 2018-07, 2018-08 and 2018-09. 
+
+The historical combined data range is from 12 hours before the called time to 12 hours after the called time. Actual availability data is given for the 12 hours before the called time (and is null for the 12 hours after). Prediction data covers the whole 24 hour period.
 
 
 
