@@ -15,7 +15,7 @@ import get_current_availability
 
 PREDICTORS_FILE = 'trainedModel/trainedPredictors.pkl'
 INTERVAL_FOR_AVAILABILITY_DATA = 600 # in seconds
-INTERVAL_FOR_NEW_PREDICTIONS = 60 # in seconds
+INTERVAL_FOR_NEW_PREDICTIONS = 180 # in seconds
 
 class Controller():
     def __init__(self):
@@ -147,6 +147,9 @@ class Controller():
 
         self.updateWeatherAndAvailabilityPredictions()
         currentPrediction = self.readCurrentAvailabilityPrediction()
+        for stationid in currentPrediction.columns.values.tolist()[1:]:
+            currentPrediction[stationid] = currentPrediction[stationid].round(2)
+        print('Curpred:\n', currentPrediction)
         currentPredictionJSON = json.dumps(self.convertPredictionToJSON(currentPrediction))
         return currentPredictionJSON
     
@@ -157,6 +160,7 @@ class Controller():
         self.updateWeatherAndAvailabilityPredictions()
         currentPrediction = self.readCurrentAvailabilityPrediction()
         currentPrediction = currentPrediction[['Time', stationid]]
+        currentPrediction[stationid] = currentPrediction[stationid].round(2)
         currentPredictionJSON = json.dumps(self.convertPredictionToJSON(currentPrediction))
         return currentPredictionJSON
     
@@ -167,6 +171,7 @@ class Controller():
         self.updateWeatherAndAvailabilityPredictions()
         currentPrediction = self.readCurrentAvailabilityPrediction()
         currentPrediction = currentPrediction[['Time', stationid]]
+        currentPrediction[stationid] = currentPrediction[stationid].round(2)
         currentPrediction = currentPrediction.loc[currentPrediction['Time'] == timestamp]
         currentPredictionJSON = json.dumps(self.convertPredictionToJSON(currentPrediction))
         return currentPredictionJSON
@@ -294,8 +299,9 @@ def main():
     print('\nBackend started from controller.py.')
     controller = Controller()
     
+    print(controller.getAvailabilityPredictionForAllStations())
     # Get current combined availability prediction +-12 h
-    print('Current combined:\n', controller.getCombinedPredictionForOneStation("2"))
+    #print('Current combined:\n', controller.getCombinedPredictionForOneStation("2"))
     
     # Get availability forecasts for all stations for the next 24 hours.
     #pred = controller.getAvailabilityPredictionForAllStations()

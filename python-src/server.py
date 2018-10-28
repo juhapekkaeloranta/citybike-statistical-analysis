@@ -80,18 +80,18 @@ class ReqHandler(BaseHTTPRequestHandler):
                 content = 'Unknown station id.'
         elif (self.path == '/prediction'):
             content = self.controller.getAvailabilityPredictionForAllStations()
-        elif (self.combinedRegex.match(self.path)):
-            stationid = self.path.split('/')[2]
-            if (int(stationid) in constants.stationIds):
-                content = self.controller.getCombinedPredictionForOneStation(stationid)
-            else:
-                content = 'Unknown station id.'
         elif (self.combinedStationHourRegex.match(self.path)):
             stationid = self.path.split('/')[2]
             timestamp = self.path.split('/')[3]
             if (int(stationid) in constants.stationIds):
                 # A time not in the historical data will return empty array
                 content = self.controller.getHistoryAvailabilityPredictionForOneStation(stationid, timestamp)
+            else:
+                content = 'Unknown station id.'
+        elif (self.combinedRegex.match(self.path)):
+            stationid = self.path.split('/')[2]
+            if (int(stationid) in constants.stationIds):
+                content = self.controller.getCombinedPredictionForOneStation(stationid)
             else:
                 content = 'Unknown station id.'
         else:
