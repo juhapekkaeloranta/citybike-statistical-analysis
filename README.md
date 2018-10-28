@@ -3,6 +3,10 @@ View citybike availability and predicted availability stationwise on a map. The 
 
 The service was a project for "Introduction to Data Science" -course at the University of Helsinki Data Science master's programme, fall 2018.
 
+<img src="/images/Citybike-predictor.jpg">
+
+<img src="/images/Citybikes_Arabia_2018_10_17.jpg">
+
 ### Related repositories
 [Frontend](https://github.com/mikkokotola/citybike-front/) for the citybike predictor app is a separate repository. This repository contains backend code.
 
