@@ -1,4 +1,4 @@
-# Statistical analysis of citybike availability in Helsinki
+# Citybike predictor
 View citybike availability and predicted availability stationwise on a map. The service is currently available for citybikes in Helsinki. Try it at [https://citybike-pred.herokuapp.com/](https://citybike-pred.herokuapp.com/)
 
 <img src="/images/Citybike-predictor.jpg">
@@ -102,4 +102,4 @@ python3 -m http.server
 
 NOTE: the frontend uses the Heroku-deployed backend. If you want to use a locally run backend, change the first line in js-src/plotter.js to const baseUrl = 'http://localhost:3001'
 
-<img src="/images/Citybikes_Arabia_2018_10_17.jpg">
+<img src="/images/Citybikes_Arabia_2018_10_17.jpg" alt="Citybikes at Arabia, Helsinki; photo: Mikko Kotola">
