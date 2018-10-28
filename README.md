@@ -73,7 +73,17 @@ To start backend server, run:
 python python-src/server.py
 ```
 
-Server will start on `localhost:3001`
+Server will start on `localhost:3001`.
+
+The server expects the environment variable FMI_API_KEY to be found in either in actual environment variables or the file .env located at the root of the project. Contents of the .env file:
+```
+FMI_API_KEY=your-fmi-apikey-here
+```
+
+For e.g. Heroku deployment, you can set the environment variable with the command:
+```
+heroku config:set FMI_API_KEY=your-fmi-apikey-here
+```
 
 ### Frontend
 
