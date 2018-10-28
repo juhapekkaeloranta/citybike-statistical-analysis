@@ -1,6 +1,7 @@
 # Statistical analysis of citybike availability in Helsinki
+View citybike availability and predicted availability stationwise on a map. The service is currently available for citybikes in Helsinki.
 
-Project for "Introduction to Data Science" -course.
+The service was a project for "Introduction to Data Science" -course at the University of Helsinki Data Science master's programme, fall 2018.
 
 ### Related repositories
 [Frontend](https://github.com/mikkokotola/citybike-front/) for the citybike predictor app is a separate repository. This repository contains backend code.
@@ -12,6 +13,11 @@ Please note that Heroku dynos go to inactive mode for non-active apps and may ta
 
 ### Project plan
 [Project plan](https://docs.google.com/document/d/1X3f5UQMo5cpXqYQnJM6-z-aw4sNIrAeuVKdYuzaYq7E/edit?usp=sharing) (preliminary) in google docs.
+
+### Contributors
+* Lea Kosonen (focus: machine learning model)
+* Mikko Kotola (focus: backend and weather data)
+* Juha-Pekka Moilanen (focus: frontend and bike data)
 
 ### City bike data
 * City bike data source (both historical download and online): https://dev.hsl.fi/citybike/stations/
@@ -47,13 +53,13 @@ Predictions for a single station defined by station id for 24 h :
 [/prediction/2](https://citybike-helsinki-predictor.herokuapp.com/prediction/2) (here station id 2)
 
 Predictions for a station defined by station id and a single hour:
-[/prediction/2/2018-10-08T19:00:00Z](https://citybike-helsinki-predictor.herokuapp.com/prediction/2/2018-10-08T19:00:00Z) (here station id 2 and time Oct 8th 2018 19:00)
+[/prediction/2/2018-10-08T19:00:00Z](https://citybike-helsinki-predictor.herokuapp.com/prediction/2/2018-10-08T19:00:00Z) (here station id 2 and time Oct 8th 2018 19:00; NOTE: the time has to be within the next 24 hours, otherwise the returned data will be empty)
 
-Combined predictions for +-12 hours:
+Current combined predictions for +-12 hours (from now):
 [/combined/2](https://citybike-helsinki-predictor.herokuapp.com/combined/2) (here station id 2)
 
 The server also serves combined historical data at paths formatted like:
-[/combined/8/2018-09-12T12:00:00Z](https://citybike-helsinki-predictor.herokuapp.com/combined/8/2018-09-12T12:00:00Z) (here station id 8 and centre time Sept 12th 2018 12:00)
+[/combined/8/2018-09-12T12:00:00Z](https://citybike-helsinki-predictor.herokuapp.com/combined/8/2018-09-12T12:00:00Z) (here station id 8 and centre time Sept 12th 2018 12:00; the times available listed under "Historical data available")
 
 The combined data range is from 12 hours before the called time to 12 hours after the called time. Actual availability data is given for the 12 hours before the called time (and is null for the 12 hours after). Prediction data covers the whole 24 hour period.
 
