@@ -67,6 +67,7 @@ The service was a project for "Introduction to Data Science" -course at the Univ
 * Juha-Pekka Moilanen (focus: frontend and bike data)
 
 ### Roadmap
+
 How could the project be continued? See [roadmap](/docs/roadmap.md).
 ---
 
