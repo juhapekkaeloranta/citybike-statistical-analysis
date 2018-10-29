@@ -69,6 +69,7 @@ The service was a project for "Introduction to Data Science" -course at the Univ
 ### Roadmap
 
 How could the project be continued? See [roadmap](/docs/roadmap.md).
+
 ---
 
 # Development
