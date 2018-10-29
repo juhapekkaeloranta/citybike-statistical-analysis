@@ -20,7 +20,7 @@ The combined data range is from 12 hours before the called time to 12 hours afte
 
 | Endpoint | Info | Example |
 |----------|------|-------|
-| `/combined/$(station_id)` | Prediction and actual availability for +-12 hours from current point of time | [GET](https://citybike-helsinki-predictor.herokuapp.com/combined/8/) |
+| `/combined/$(station_id)` | Prediction and actual availability for one station for +-12 hours from current point of time | [GET](https://citybike-helsinki-predictor.herokuapp.com/combined/8/) |
 | `/combined/$(station_id)/$(timestamp)` | Same as `/combined/$(station_id)` but for a historical timestamp (months available: 2017-06, 2017-08, 2017-09, 2018-06, 2018-07, 2018-08 and 2018-09 | [GET](https://citybike-helsinki-predictor.herokuapp.com/combined/8/2018-09-12T12:00:00Z) |
 
 ## Samples 
