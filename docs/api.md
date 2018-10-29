@@ -6,7 +6,7 @@ The server currently serves 24 hour availability prediction data in JSON format 
 
 | Endpoint | Info | Example |
 |----------|------|-------|
-| `/prediction` | Predictions for all stations for next 24 h | [GET](https://citybike-helsinki-predictor.herokuapp.com/prediction/2) |
+| `/prediction` | Predictions for all stations for next 24 h | [GET](https://citybike-helsinki-predictor.herokuapp.com/prediction) |
 | `/prediction/$(station_id)` | Same as `prediction` but for one station | [GET](https://citybike-helsinki-predictor.herokuapp.com/prediction/2) |
 | `/prediction/$(station_id)/$(timestamp)` | Same as `prediction/2` but for only one timestamp | [GET](https://citybike-helsinki-predictor.herokuapp.com/prediction/2/2018-10-08T19:00:00Z) |
 
@@ -20,12 +20,8 @@ The combined data range is from 12 hours before the called time to 12 hours afte
 
 | Endpoint | Info | Example |
 |----------|------|-------|
-| `/combined/$(station_id)` | Prediction and actual availability for +-12 hours | [GET](https://citybike-helsinki-predictor.herokuapp.com/combined/8/) |
-| `/combined/$(station_id)/$(timestamp)` | Same as `/combined/$(station_id)` but for only one timestamp | [GET](https://citybike-helsinki-predictor.herokuapp.com/combined/8/2018-09-12T12:00:00Z) |
-
-Additional notes:
-- `/combined/$(station_id)/$(timestamp)`
-  - The time has to be within the next 24 hours, otherwise the returned data will be empty
+| `/combined/$(station_id)` | Prediction and actual availability for +-12 hours from current point of time | [GET](https://citybike-helsinki-predictor.herokuapp.com/combined/8/) |
+| `/combined/$(station_id)/$(timestamp)` | Same as `/combined/$(station_id)` but for a historical timestamp (months available: 2017-06, 2017-08, 2017-09, 2018-06, 2018-07, 2018-08 and 2018-09 | [GET](https://citybike-helsinki-predictor.herokuapp.com/combined/8/2018-09-12T12:00:00Z) |
 
 ## Samples 
 
