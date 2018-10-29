@@ -2,7 +2,9 @@
 
 ## Step 1: Get historical bike data in JSON and convert to CSV
 
-Availabilitydata from the citybikes is available from http://dev.hsl.fi/tmp/citybikes/. There is a json file for roughly every minute from the operation of the city bike system. That is aroung 43000 json files per month.
+Availability data from the citybike stations is available from http://dev.hsl.fi/tmp/citybikes/. Currently some data is missing from HSL API but we managed to get some via email by asking nicely from the provider. There is a json file for roughly every minute from the operation of the city bike system.
+
+That is around 43000 json files per month...
 
 Sample:
 
@@ -139,12 +141,8 @@ The predictions are created in runtime. The user clicks on a station and the fro
 * For the requested station, returns the availability of the bikes in the last 12 h and the predicted availability both in the last 12 h and the next 12 h
 
 ## Other kinds of predictions supported by the backend API
-* At /prediction, the 24 h availability predictions for all stations (no availability data)
-* At /prediction/2, the 24 h availability prediction for a single station (no availability data)
-* At /prediction/2/2018-10-21T14:00:00Z, the availability prediction for a single station at a single hour (within the next 24 h) (no availability data)
-* At /combined/8/2018-09-12T12:00:00Z, combined historical data (similar to the current combined but in the past) for the months 2017-06, 2017-07, 2017-08, 2018-06, 2018-07, 2018-08 and 2018-09. 
 
-The historical combined data range is from 12 hours before the called time to 12 hours after the called time. Actual availability data is given for the 12 hours before the called time (and is null for the 12 hours after). Prediction data covers the whole 24 hour period.
+See [api documentation](/docs/api.md) for more details
 
 
 
