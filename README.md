@@ -47,24 +47,7 @@ For testing and demostration purposes we have prepared data from 7 months (2017-
 
 ## Backend server API
 
-The server currently serves 24 hour availability prediction data in JSON format at http://localhost:3001 (local mode) and https://citybike-helsinki-predictor.herokuapp.com (Heroku deployment) with the following (REST-type) paths:
-
-Predictions for all stations for 24 h :
-[/prediction](https://citybike-helsinki-predictor.herokuapp.com/prediction)
-
-Predictions for a single station defined by station id for 24 h :
-[/prediction/2](https://citybike-helsinki-predictor.herokuapp.com/prediction/2) (here station id 2)
-
-Predictions for a station defined by station id and a single hour:
-[/prediction/2/2018-10-08T19:00:00Z](https://citybike-helsinki-predictor.herokuapp.com/prediction/2/2018-10-08T19:00:00Z) (here station id 2 and time Oct 8th 2018 19:00; NOTE: the time has to be within the next 24 hours, otherwise the returned data will be empty)
-
-Current combined predictions for +-12 hours (from now):
-[/combined/2](https://citybike-helsinki-predictor.herokuapp.com/combined/2) (here station id 2)
-
-The server also serves combined historical data at paths formatted like:
-[/combined/8/2018-09-12T12:00:00Z](https://citybike-helsinki-predictor.herokuapp.com/combined/8/2018-09-12T12:00:00Z) (here station id 8 and centre time Sept 12th 2018 12:00; the times available listed under "Historical data available")
-
-The combined data range is from 12 hours before the called time to 12 hours after the called time. Actual availability data is given for the 12 hours before the called time (and is null for the 12 hours after). Prediction data covers the whole 24 hour period.
+Backend server has REST API has endpoints predictions and past availability. For more detailed information please see: [API docs](/docs/api.md)
 
 # About
 
