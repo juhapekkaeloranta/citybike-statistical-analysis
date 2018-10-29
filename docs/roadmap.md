@@ -10,7 +10,6 @@ Visualize training data and the model created by that data. Similarly as the qui
 
 _image: wikipedia_
 
-
 Also weather impact could be visualized.
 
 ### Operator-mode
@@ -28,7 +27,7 @@ Center map to user gps location
 
 ### Nearby stations
 
-- Add information
+- Add information about amount of bikes in nearby stations to the model
 
 ### Events and other anomalies
 
