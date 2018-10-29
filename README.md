@@ -21,6 +21,9 @@ These examples demonstrate the usefulness predictions in various situations:
 
 > Please note that our current application servers might take around 30-45 seconds the start if they have gone idle.
 
+**Winter is coming!**
+- Application will go to demo-mode during off-season _(31.10.2018 - next spring)_
+
 # Technical
 
 ## Data
