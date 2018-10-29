@@ -93,7 +93,7 @@ order by
 ```
 
 ## Step 3: Fetch bike availability for the last 12 hours
-Bike availability data for the last 12 hours is fetched from the same source as the historical data: http://dev.hsl.fi/tmp/citybikes/. Because the source data is by the minute and aggregation would be somewhat heavy in runtime, the script in [get_current_availability.py]((/python-src/get_current_availability.py)) reads the directory listing and picks the first available minute after every even hour. This is most often of type https://dev.hsl.fi/citybike/stations/stations_20181026T160001Z.json (the scripts writing the source data finish at one second past the hour most of the time), but sometimes the first available data is several minutes past the hour. The script then writes the availabilities for the last 12 hours into[csv](/prediction/pastavailabilities-current.csv) in similar format as the historical hourly aggregated availabilities.
+Bike availability data for the last 12 hours is fetched from the same source as the historical data: http://dev.hsl.fi/tmp/citybikes/. Because the source data is by the minute and aggregation would be somewhat heavy in runtime, the script in [get_current_availability.py]((/python-src/get_current_availability.py) reads the directory listing and picks the first available minute after every even hour. This is most often of type https://dev.hsl.fi/citybike/stations/stations_20181026T160001Z.json (the scripts writing the source data finish at one second past the hour most of the time), but sometimes the first available data is several minutes past the hour. The script then writes the availabilities for the last 12 hours into [csv](/prediction/pastavailabilities-current.csv) in similar format as the historical hourly aggregated availabilities.
 
 ## Step 4: Fetch weather observations and forecasts
 Weather data is fetched from the Finnish Meteorological Institute under license CC BY 4.0.
@@ -134,7 +134,7 @@ The predictions are created in runtime. The user clicks on a station and the fro
 * Wakes up from inactive state (in Heroku) (if dyno was inactive)
 * Loads predictors (model) from memory  (if dyno was inactive)
 * Updates the bike availability data for the last 12 h for all stations (if data over 10 min old)
-* Updates the weather observations for the last 12 h and weather prediction for the next 24 h (if data over 1 min old)
+* Updates the weather observations for the last 12 h and weather prediction for the next 24 h (if data over 3 min old)
 * Creates availability predictions (using the model) for the last 12 h based on the weather observations and for the next 12 h based on the weather forecast - and combines these two into a combined prediction
 * Reads in the combined predictions and bike availability data and merges these into one Pandas dataframe
 * Filters the data by the requested station
@@ -142,7 +142,7 @@ The predictions are created in runtime. The user clicks on a station and the fro
 
 ## Other kinds of predictions supported by the backend API
 
-See [api documentation](/docs/api.md) for more details
+See [API documentation](/docs/api.md) for more details
 
 
 
