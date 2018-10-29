@@ -2,26 +2,6 @@
 
 The scope of this project was very limited. Some further work is listed here:
 
-### Model visualizations
-
-The model is a "mixed model" consisting of a linear combination of different n-degree polynomials that were fit for each factor in relation to station bike-availability (factors: temperature, rain amount, hour of the day). 
-
-We can look at the three scatterplots that represent each factors' relationship with the bike availability on the aggregate level:
-
-Bike-availability vs. temperature:
-
-<img src="/images/ScatterplotRelationshipBetweenAvailabilityAndTemperature.png">
-
-Bike-availability vs. hour of the day:
-
-<img src="/images/ScatterplotRelationshipBetweenAvailabilityAndHourOfTheDay.png">
-
-Bike-availability vs. rain amount (precipitation):
-
-<img src="/images/ScatterplotRelationshipBetweenAvailabilityAndRain.png">
-
-We assume that each station has its own trend with each of the factors and the station's bike-availability, so that is how the factors are utilized at the station-level to fit n-degree polynomials for station-wise prediction purposes.
-
 ### Some initial thoughts on variables in the early stage of the project:
 
 #### On independent variable 'rainintensity_mmh':
