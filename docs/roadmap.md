@@ -22,7 +22,7 @@ Bike-availability vs. rain amount (precipitation):
 
 We assume that each station has its own trend with each of the factors and the station's bike-availability, so that is how the factors are utilized at the station-level to fit n-degree polynomials for station-wise prediction purposes.
 
-### Some initial thoughts on variables
+### Some initial thoughts on variables in the early stage of the project:
 
 #### On independent variable 'rainintensity_mmh':
 
