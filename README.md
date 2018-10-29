@@ -37,6 +37,9 @@ We have combined citybike availability data from HSL and weather data from FMI. 
   * Historical data loaded from: https://ilmatieteenlaitos.fi/havaintojen-lataus#!/
   * Weather observations and predictions loaded from FMI open data API, see https://en.ilmatieteenlaitos.fi/open-data-manual-fmi-wfs-services
 
+### Historical data available
+For testing and demonstration purposes we have prepared data from 7 months (2017-06, 2017-08, 2017-09, 2018-06, 2018-07, 2018-08 and 2018-09). Please see the `/data`-folder for more details.
+
 ## Source code
 
 - [Backend](python-src/server.py) source code is in this repository
@@ -48,7 +51,7 @@ The model is a "mixed model" consisting of a linear combination of different n-d
 
 Read more about the model here: ["Model"](/docs/model.md)
 
-For testing and demonstration purposes we have prepared data from 7 months (2017-06, 2017-08, 2017-09, 2018-06, 2018-07, 2018-08 and 2018-09). Please see the `/data`-folder for more details.
+Was the choice of predictors chrystal clear from the start? Nope. Read some thoughts on model variables in the early stage of the project: ["Early thoughts on variables"](/docs/early-thoughts.md)
 
 ## Backend server API
 
@@ -63,6 +66,8 @@ The service was a project for "Introduction to Data Science" -course at the Univ
 * Mikko Kotola (focus: backend and weather data)
 * Juha-Pekka Moilanen (focus: frontend and bike data)
 
+### Roadmap
+How could the project be continued? See [roadmap](/docs/roadmap.md).
 ---
 
 # Development
