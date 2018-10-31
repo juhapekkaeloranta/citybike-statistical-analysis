@@ -26,7 +26,8 @@ class Controller():
         self.predictors = self.readPredictorsFromPickle()
         self.latestAvailabilityUpdateTime = datetime.datetime(2000, 1, 1)
         self.latestPredictionUpdateTime = datetime.datetime(2000, 1, 1)
-        self.updateWeatherAndAvailabilityPredictions()
+        # Winter mode: don't initially update current data
+        #self.updateWeatherAndAvailabilityPredictions()
         self.latestPredictionUpdateTime = datetime.datetime.now()
         self.historyPrediction = {}
         self.bikeAvailabilityHistory = {}
