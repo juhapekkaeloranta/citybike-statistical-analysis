@@ -22,14 +22,12 @@ WEATHERFORECASTOUTFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-' + date
 CURRENTWEATHERFORECASTFILE = 'prediction/weatherforecast-HelsinkiKaisaniemi-current.csv'
 WEATHEROBSERVATIONSOUTFILE = 'prediction/weatherobservations-HelsinkiKaisaniemi-' + datetime.datetime.now().replace(microsecond=0).isoformat() + '.csv'
 CURRENTWEATHEROBSERVATIONSFILE = 'prediction/weatherobservations-HelsinkiKaisaniemi-current.csv'
-REQUESTURL_FORECAST = 'http://data.fmi.fi/fmi-apikey/' \
-           + str(getFmiApiKey()) + '/' \
+REQUESTURL_FORECAST = 'https://opendata.fmi.fi/' \
            + 'wfs?request=getFeature&storedquery_id=' \
            + 'fmi::forecast::harmonie::surface::point::timevaluepair' \
            + '&place=' + WEATHERLOCATION
 
-REQUESTURL_OBSERVATIONS = 'http://data.fmi.fi/fmi-apikey/' \
-           + str(getFmiApiKey()) + '/' \
+REQUESTURL_OBSERVATIONS = 'https://opendata.fmi.fi/' \
            + 'wfs?request=getFeature&storedquery_id=' \
            + 'fmi::observations::weather::timevaluepair' \
            + '&place=' + WEATHERLOCATION \
