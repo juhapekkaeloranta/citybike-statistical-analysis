@@ -4,6 +4,8 @@ _I wonder if there are any citybikes left on Yliopistonkatu.._ 💭
 
 [Citybike predictor](https://citybike-pred.herokuapp.com/) shows the past and predicted availability of citybikes! 
 
+NOTE: as of 4.1.2020, the backend is not functional in historical mode due to the unavailability of historical citybike availability data from HSL at https://dev.hsl.fi/citybike/stations/. The app will be in summer mode until further notice.
+
 <img width="75%" src="/images/application_screencapture.png">
 
 These examples demonstrate the usefulness predictions in various situations:
